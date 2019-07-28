@@ -1,0 +1,12 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AIDev.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="AIDevFolderPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">C:\Users\Admin\Data\Dev\AI Dev</Value>
+    </Setting>
+    <Setting Name="ttsVoice" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Microsoft David Desktop</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

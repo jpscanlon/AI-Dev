@@ -1,0 +1,75 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2035
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIDev", "AIDev\AIDev.csproj", "{4F6980FC-6D8C-4E8C-A223-455993329A3B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699} = {CAB2F554-7CAD-4CFA-83A6-F142811B9699}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AIDevServer", "AIDevServer\AIDevServer.csproj", "{CAB2F554-7CAD-4CFA-83A6-F142811B9699}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A6EA7079-C161-4A10-9DAC-7BE5C6BE768C}"
+	ProjectSection(SolutionItems) = preProject
+		Common.cs = Common.cs
+		LangBNF.cs = LangBNF.cs
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug Multiple|Any CPU = Debug Multiple|Any CPU
+		Debug Multiple|x64 = Debug Multiple|x64
+		Debug Multiple|x86 = Debug Multiple|x86
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug Multiple|Any CPU.ActiveCfg = Debug Multiple|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug Multiple|Any CPU.Build.0 = Debug Multiple|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug Multiple|x64.ActiveCfg = Debug Server|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug Multiple|x64.Build.0 = Debug Server|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug Multiple|x86.ActiveCfg = Debug Multiple|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug Multiple|x86.Build.0 = Debug Multiple|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug|x64.ActiveCfg = Debug|x64
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug|x64.Build.0 = Debug|x64
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Debug|x86.Build.0 = Debug|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Release|x64.ActiveCfg = Release|x64
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Release|x64.Build.0 = Release|x64
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Release|x86.ActiveCfg = Release|Any CPU
+		{4F6980FC-6D8C-4E8C-A223-455993329A3B}.Release|x86.Build.0 = Release|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug Multiple|Any CPU.ActiveCfg = Debug Multiple|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug Multiple|Any CPU.Build.0 = Debug Multiple|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug Multiple|x64.ActiveCfg = Debug Multiple|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug Multiple|x64.Build.0 = Debug Multiple|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug Multiple|x86.ActiveCfg = Debug Multiple|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug Multiple|x86.Build.0 = Debug Multiple|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug|x64.Build.0 = Debug|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Debug|x86.Build.0 = Debug|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Release|x64.ActiveCfg = Release|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Release|x64.Build.0 = Release|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Release|x86.ActiveCfg = Release|Any CPU
+		{CAB2F554-7CAD-4CFA-83A6-F142811B9699}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {852F3765-398F-4F3D-BC89-006A3BF86DDF}
+	EndGlobalSection
+EndGlobal
