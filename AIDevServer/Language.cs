@@ -987,7 +987,8 @@ namespace AIDevServer
             {
                 if (queryTreeTokens[token].Name == "what" ||
                     queryTreeTokens[token].Name == "where" ||
-                    queryTreeTokens[token].Name == "when_why_how")
+                    queryTreeTokens[token].Name == "when_why_how" ||
+                    queryTreeTokens[token].Name == "truthof")
                 {
                     type = queryTreeTokens[token].Literal;
                 }
