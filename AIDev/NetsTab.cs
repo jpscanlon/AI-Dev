@@ -46,7 +46,7 @@ namespace AIDev
         private void LoadNetsView()
         {
             string response = "";
-            response = TCPConnection.SendMessage("getnets");
+            response = TcpConnection.SendMessage("getnets");
 
             Nets = new List<Net>();  // Try removing creation of a new nets list here.
             // Binding the listview again here seems to be the only way to get the listview to populate.
@@ -173,7 +173,7 @@ namespace AIDev
 
             string response = "";
             
-            response = TCPConnection.SendMessage(command);
+            response = TcpConnection.SendMessage(command);
 
             if (response != "error")
             {
@@ -227,7 +227,7 @@ namespace AIDev
         private void CreateNet()
         {
             string response = "";
-            response = TCPConnection.SendMessage("addnet");
+            response = TcpConnection.SendMessage("addnet");
 
             if (response != "")
             {
@@ -266,7 +266,7 @@ namespace AIDev
         {
             char quote = '"';
 
-            TCPConnection.SendMessage("deletenet " + quote + name + quote);
+            TcpConnection.SendMessage("deletenet " + quote + name + quote);
         }
 
         private void StopTraining()
@@ -276,7 +276,7 @@ namespace AIDev
 
             command = "stoptraining";
 
-            response = TCPConnection.SendMessage(command);
+            response = TcpConnection.SendMessage(command);
             buttonNetStop.IsEnabled = false;
             buttonTrainStop.IsEnabled = false;
             buttonTrainBump.IsEnabled = false;
@@ -355,7 +355,7 @@ namespace AIDev
                 command = "updatenet " + descriptionArguments;
             }
 
-            response = TCPConnection.SendMessage(command);
+            response = TcpConnection.SendMessage(command);
 
             LoadNetsView();
             ViewNet(textBoxNetName.Text);
@@ -428,7 +428,7 @@ namespace AIDev
 
             command = "runnet \"" + currentInputImage + "\"";
 
-            response = TCPConnection.SendMessage(command);
+            response = TcpConnection.SendMessage(command);
 
             //MessageBox.Show("Server response: \r\n" + response);
             MessageBox.Show(response);
@@ -462,7 +462,7 @@ namespace AIDev
             string args = '"' + comboBoxNetDataset.Text + "\" \"" + textBoxNetIterationSize.Text + '"';
             command = command + " " + args;
 
-            response = TCPConnection.SendMessage(command);
+            response = TcpConnection.SendMessage(command);
 
             if (response == "training started")
             {
@@ -497,7 +497,7 @@ namespace AIDev
         {
             string response = "";
             string dataPointSize;
-            response = TCPConnection.SendMessage("geterrorhistory");
+            response = TcpConnection.SendMessage("geterrorhistory");
             if (response == "training stopped" || response == "training finished")
             {
                 timerTrainingPlot.Stop();
@@ -635,7 +635,7 @@ namespace AIDev
 
             command = "reinitialize";
 
-            response = TCPConnection.SendMessage(command);
+            response = TcpConnection.SendMessage(command);
 
             MessageBox.Show("Server response: \r\n" + response);
         }
@@ -653,7 +653,7 @@ namespace AIDev
 
             command = "bump";
 
-            response = TCPConnection.SendMessage(command);
+            response = TcpConnection.SendMessage(command);
         }
 
         private void ButtonTrainStop_Click(object sender, RoutedEventArgs e)

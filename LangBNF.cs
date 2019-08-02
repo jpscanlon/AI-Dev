@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 //namespace AIDev
 //{
-class LangBNF
+class LangBnf
 {
     public static List<LangRule> LangRules;
     public static List<LexRule> LexRules;
@@ -909,7 +909,7 @@ class LangBNF
 
         LongestPhraseSize = GetLongestPhraseSize();
 
-        //LoadEBNF();
+        //LoadEbnf();
     }
 
     public static void LoadLexRules()
@@ -1708,7 +1708,7 @@ class LangBNF
 
     // Returns the matching BNF token name for word type from the word-type as expressed in
     // statements. Returns an empty string if there isn't a match.
-    public static string GetBNFType(string type)
+    public static string GetBnfType(string type)
     {
         string bnfType;
 
@@ -1743,7 +1743,7 @@ class LangBNF
     // Loads item types from item strings into corresponding ItemTypes arrays. For example: takes
     // "[list] adj_unit" and sets the item type to enum ItemType.List, then removes "[list] " from the string.
     // Ordinary items get set to enum ItemType.Simple.
-    private static void LoadEBNF()
+    private static void LoadEbnf()
     {
         int numClauseItems;
 
@@ -1857,7 +1857,7 @@ class LangBNF
         }
     }
 
-    public class WordLocation
+    public struct WordLocationInBnf
     {
         public int Rule;
         public int Clause;

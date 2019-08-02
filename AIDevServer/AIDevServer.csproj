@@ -88,9 +88,6 @@
     <Compile Include="..\Common.cs">
       <Link>Common.cs</Link>
     </Compile>
-    <Compile Include="..\LangBNF.cs">
-      <Link>LangBNF.cs</Link>
-    </Compile>
     <Compile Include="Net.cs" />
     <Compile Include="Knowledgebase.cs" />
     <Compile Include="KnowledgebaseDataSet.Designer.cs">

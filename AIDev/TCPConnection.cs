@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace AIDev
 {
-    public class TCPConnection
+    public class TcpConnection
     {
         // These values should eventually be changed from static to dynamic runtime.
         //private static readonly string serverIP = "127.0.0.1";

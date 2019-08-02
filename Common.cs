@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 //
 static class Common
 {
-    // Example of a nested method, and scope of a variable declared in a block.
+    // Examples of a nested method, and scope of a variable declared in a block.
     public static bool ContainerMethod()
     {
         bool NestedMethod()

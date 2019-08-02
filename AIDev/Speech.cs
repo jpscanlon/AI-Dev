@@ -406,24 +406,24 @@ namespace AIDev
             string spokenRec;
             int item;
 
-            for (int rule = 0; rule < LangBNF.LexRules.Count; rule++)
+            for (int rule = 0; rule < LangBnf.LexRules.Count; rule++)
             {
-                for (int clause = 0; clause < LangBNF.LexRules[rule].Clauses.Count; clause++)
+                for (int clause = 0; clause < LangBnf.LexRules[rule].Clauses.Count; clause++)
                 {
-                    for (item = 0; item < LangBNF.LexRules[rule].Clauses[clause].Items.Count; item++)
+                    for (item = 0; item < LangBnf.LexRules[rule].Clauses[clause].Items.Count; item++)
                     {
-                        if (LangBNF.LexRules[rule].Clauses[clause].Items[item].SpokenRec == null)
+                        if (LangBnf.LexRules[rule].Clauses[clause].Items[item].SpokenRec == null)
                         {
-                            spokenRec = LangBNF.LexRules[rule].Clauses[clause].Items[item].Word;
+                            spokenRec = LangBnf.LexRules[rule].Clauses[clause].Items[item].Word;
                         }
                         else
                         {
-                            spokenRec = LangBNF.LexRules[rule].Clauses[clause].Items[item].SpokenRec;
+                            spokenRec = LangBnf.LexRules[rule].Clauses[clause].Items[item].SpokenRec;
                         }
 
                         choices.Add(spokenRec);
                         spokenRecRules.Add(new SpokenRule(spokenRec,
-                            LangBNF.LexRules[rule].Clauses[clause].Items[item].Word));
+                            LangBnf.LexRules[rule].Clauses[clause].Items[item].Word));
                     }
                 }
             }
@@ -435,17 +435,17 @@ namespace AIDev
 
             spokenSynthRules.Clear();
 
-            for (int rule = 0; rule < LangBNF.LexRules.Count; rule++)
+            for (int rule = 0; rule < LangBnf.LexRules.Count; rule++)
             {
-                for (int clause = 0; clause < LangBNF.LexRules[rule].Clauses.Count; clause++)
+                for (int clause = 0; clause < LangBnf.LexRules[rule].Clauses.Count; clause++)
                 {
-                    for (item = 0; item < LangBNF.LexRules[rule].Clauses[clause].Items.Count; item++)
+                    for (item = 0; item < LangBnf.LexRules[rule].Clauses[clause].Items.Count; item++)
                     {
-                        if (LangBNF.LexRules[rule].Clauses[clause].Items[item].SpokenSynth != null)
+                        if (LangBnf.LexRules[rule].Clauses[clause].Items[item].SpokenSynth != null)
                         {
                             spokenSynthRules.Add(new SpokenRule(
-                            LangBNF.LexRules[rule].Clauses[clause].Items[item].SpokenSynth,
-                            LangBNF.LexRules[rule].Clauses[clause].Items[item].Word));
+                            LangBnf.LexRules[rule].Clauses[clause].Items[item].SpokenSynth,
+                            LangBnf.LexRules[rule].Clauses[clause].Items[item].Word));
                         }
                     }
                 }

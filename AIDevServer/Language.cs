@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -19,7 +18,7 @@ namespace AIDevServer
         private static int parseTreeRoot;
         private static List<Token> astTokens;
         private static int astRoot;
-        private static bool startNewASTPass;
+        private static bool startNewAstPass;
 
         // topTokens holds indexes of all top-level tokens being parsed
         private static List<int> topTokens;
@@ -34,8 +33,8 @@ namespace AIDevServer
 
         public static void LoadLang()
         {
-            LangBNF.LoadLangRules();
-            LangBNF.LoadLexRules();
+            LangBnf.LoadLangRules();
+            LangBnf.LoadLexRules();
             LoadUDWords();
             langKnowledge = LoadLangKnowledge();
         }
@@ -51,73 +50,57 @@ namespace AIDevServer
         {
             string errorMsg = "";
             string response = "";
-            bool isTestStatement = true;
             string strippedStmts;
 
-            if (LangBNF.LangRules == null || LangBNF.LexRules == null || langKnowledge == null)
+            if (LangBnf.LangRules == null || LangBnf.LexRules == null || langKnowledge == null)
             {
                 LoadLang();
             }
 
             strippedStmts = StripWhiteSpace(statements.ToLower());
+            errorMsg = ParseStmts(strippedStmts);
 
-            // For testing.
-            switch (strippedStmts)
+            if (errorMsg == "")
             {
-                //case "nibbler is where ;":
-                //    response = "on mars;";
-                //    break;
-                default:
-                    isTestStatement = false;
-                    break;
-            }
+                // Traverse parse tree and execute statements.
+                GenerateAst();
 
-            if (!isTestStatement)
-            {
-                errorMsg = ParseStmts(strippedStmts);
+                string semanticResponse = ProcessSemantics();
 
-                if (errorMsg == "")
+                if (debugOn)
                 {
-                    // Traverse parse tree and execute statements.
-                    GenerateAST();
+                    debugOutput = debugOutput + GetParseTreeDescription() + "\r\n\r\n";
+                    debugOutput = debugOutput + GetParseTreeDescription(true) + "\r\n";
+                    File.AppendAllText(AppProperties.ServerLogPath, "\r\n" + debugOutput);
+                }
 
-                    string semanticResponse = ProcessSemantics();
+                if (returnParseResults)
+                {
+                    response = "Parse succeeded.\r\n\r\n" + GetParseTreeDescription() + "\r\n\r\n" +
+                        GetParseTreeDescription(true);
+                }
 
-                    if (debugOn)
-                    {
-                        debugOutput = debugOutput + GetParseTreeDescription() + "\r\n\r\n";
-                        debugOutput = debugOutput + GetParseTreeDescription(true) + "\r\n";
-                        File.AppendAllText(AppProperties.ServerLogPath, "\r\n" + debugOutput);
-                    }
-
-                    if (returnParseResults)
-                    {
-                        response = "Parse succeeded.\r\n\r\n" + GetParseTreeDescription() + "\r\n\r\n" +
-                            GetParseTreeDescription(true);
-                    }
-
-                    if (semanticResponse == "")
-                    {
-                        response = response + "okay;\r\n";
-                    }
-                    else
-                    {
-                        response = response + semanticResponse;
-                    }
+                if (semanticResponse == "")
+                {
+                    response = response + "okay;\r\n";
                 }
                 else
                 {
-                    //response = "I'm sorry, Dave. I'm afraid I can't do that.\r\n";
-                    response = errorMsg + "\r\n";
-                    if (debugOn)
-                    {
-                        File.AppendAllText(AppProperties.ServerLogPath, debugOutput + 
-                            errorMsg + "\r\n");
-                    }
+                    response = response + semanticResponse;
                 }
-                // Save non-temporary linguistic knowledge to file.
-                SaveLangKnowledge();
             }
+            else
+            {
+                //response = "I'm sorry, Dave. I'm afraid I can't do that.\r\n";
+                response = errorMsg + "\r\n";
+                if (debugOn)
+                {
+                    File.AppendAllText(AppProperties.ServerLogPath, debugOutput + 
+                        errorMsg + "\r\n");
+                }
+            }
+            // Save non-temporary linguistic knowledge to file.
+            SaveLangKnowledge();
 
             return response;
         }
@@ -190,23 +173,23 @@ namespace AIDevServer
                 {
                     //string type = LangBNF.LexRules[rule].Token;
                     response = response +
-                        "Type: " + LangBNF.LexRules[rule].Token +
-                       ", UD: " + LangBNF.LexRules[rule].Clauses[clause].UserDefined +
-                        ", Temp: " + LangBNF.LexRules[rule].Clauses[clause].Temp + "\r\n" +
-                        LangBNF.LexRules[rule].Clauses[clause].Items[0].Word + 
+                        "Type: " + LangBnf.LexRules[rule].Token +
+                       ", UD: " + LangBnf.LexRules[rule].Clauses[clause].UserDefined +
+                        ", Temp: " + LangBnf.LexRules[rule].Clauses[clause].Temp + "\r\n" +
+                        LangBnf.LexRules[rule].Clauses[clause].Items[0].Word + 
                         " SpokenRec: \"" +
-                        LangBNF.LexRules[rule].Clauses[clause].Items[0].SpokenRec + 
+                        LangBnf.LexRules[rule].Clauses[clause].Items[0].SpokenRec + 
                         "\", SpokenSynth: \"" +
-                        LangBNF.LexRules[rule].Clauses[clause].Items[0].SpokenSynth + "\"\r\n";
+                        LangBnf.LexRules[rule].Clauses[clause].Items[0].SpokenSynth + "\"\r\n";
                     for (int itemNum = 1; 
-                        itemNum < LangBNF.LexRules[rule].Clauses[clause].Items.Count; itemNum++)
+                        itemNum < LangBnf.LexRules[rule].Clauses[clause].Items.Count; itemNum++)
                     {
                         response = response +
-                            LangBNF.LexRules[rule].Clauses[clause].Items[itemNum].Word +
+                            LangBnf.LexRules[rule].Clauses[clause].Items[itemNum].Word +
                         " SpokenRec: \"" +
-                        LangBNF.LexRules[rule].Clauses[clause].Items[itemNum].SpokenRec +
+                        LangBnf.LexRules[rule].Clauses[clause].Items[itemNum].SpokenRec +
                         "\", SpokenSynth: \"" +
-                        LangBNF.LexRules[rule].Clauses[clause].Items[itemNum].SpokenSynth + "\"\r\n";
+                        LangBnf.LexRules[rule].Clauses[clause].Items[itemNum].SpokenSynth + "\"\r\n";
 
                     }
                 }
@@ -320,17 +303,17 @@ namespace AIDevServer
 
             string word = astTokens[astTokens[node].Children[1]].Literal;
 
-            LangBNF.WordLocation wordLocation = FindWordInBNF(word);
+            LangBnf.WordLocation wordLocation = FindWordInBNF(word);
 
             if (wordLocation != null)
             {
                 //string type = LangBNF.LexRules[wordLocation.Rule].Token;
                 //if (type == "adj" || type == "disc_obj_noun" || type == "non_disc_obj_noun" ||
                 //    type == "class_noun" || type == "intrans_verb" || type == "trans_verb")
-                if (LangBNF.LexRules[wordLocation.Rule].Clauses[wordLocation.Clause].UserDefined)
+                if (LangBnf.LexRules[wordLocation.Rule].Clauses[wordLocation.Clause].UserDefined)
                 {
-                    LangBNF.WordForm wordForm = GetWordForm(word);
-                    LangBNF.LexRules[wordLocation.Rule].Clauses.RemoveAt(wordLocation.Clause);
+                    LangBnf.WordForm wordForm = GetWordForm(word);
+                    LangBnf.LexRules[wordLocation.Rule].Clauses.RemoveAt(wordLocation.Clause);
                     DeleteWordKB(word, wordForm);
                 }
                 else
@@ -346,22 +329,22 @@ namespace AIDevServer
             return response;
         }
 
-        private static void DeleteWordKB(string word, LangBNF.WordForm wordForm)
+        private static void DeleteWordKB(string word, LangBnf.WordForm wordForm)
         {
             string wordColumn = "";
 
             switch (wordForm)
             {
-                case LangBNF.WordForm.Base:
+                case LangBnf.WordForm.Base:
                     wordColumn = "base";
                     break;
-                case LangBNF.WordForm.NounPlural:
+                case LangBnf.WordForm.NounPlural:
                     wordColumn = "noun_plural";
                     break;
-                case LangBNF.WordForm.VerbSingular:
+                case LangBnf.WordForm.VerbSingular:
                     wordColumn = "verb_singular";
                     break;
-                case LangBNF.WordForm.VerbPast:
+                case LangBnf.WordForm.VerbPast:
                     wordColumn = "verb_past";
                     break;
             }
@@ -440,7 +423,7 @@ namespace AIDevServer
 
         private static void UpdateSpokenBNF(string word, string spokenRec, string spokenSynth)
         {
-            LangBNF.WordLocation wordLocation = FindWordInBNF(word);
+            LangBnf.WordLocation wordLocation = FindWordInBNF(word);
 
             if (wordLocation != null)
             {
@@ -449,14 +432,14 @@ namespace AIDevServer
                 {
                     // If parameter is an empty string, update to null.
                     if (spokenRec == "") spokenRec = null;
-                    LangBNF.LexRules[wordLocation.Rule].Clauses[wordLocation.Clause].
+                    LangBnf.LexRules[wordLocation.Rule].Clauses[wordLocation.Clause].
                         Items[wordLocation.Item].SpokenRec = spokenRec;
                 }
 
                 if (spokenSynth != null)
                 {
                     if (spokenSynth == "") spokenSynth = null;
-                    LangBNF.LexRules[wordLocation.Rule].Clauses[wordLocation.Clause].
+                    LangBnf.LexRules[wordLocation.Rule].Clauses[wordLocation.Clause].
                         Items[wordLocation.Item].SpokenSynth = spokenSynth;
                 }
             }
@@ -480,26 +463,26 @@ namespace AIDevServer
                 //    base_spoken_synth = @spoken_synth
                 //WHERE base = @base
 
-                LangBNF.WordForm wordForm = GetWordForm(word);
+                LangBnf.WordForm wordForm = GetWordForm(word);
 
                 switch (wordForm)
                 {
-                    case LangBNF.WordForm.Base:
+                    case LangBnf.WordForm.Base:
                         wordColumn = "base";
                         spokenRecColumn = "base_spoken_rec";
                         spokenSynthColumn = "base_spoken_synth";
                         break;
-                    case LangBNF.WordForm.NounPlural:
+                    case LangBnf.WordForm.NounPlural:
                         wordColumn = "noun_plural";
                         spokenRecColumn = "noun_plural_spoken_rec";
                         spokenSynthColumn = "noun_plural_spoken_synth";
                         break;
-                    case LangBNF.WordForm.VerbSingular:
+                    case LangBnf.WordForm.VerbSingular:
                         wordColumn = "verb_singular";
                         spokenRecColumn = "verb_singular_spoken_rec";
                         spokenSynthColumn = "verb_singular_spoken_synth";
                         break;
-                    case LangBNF.WordForm.VerbPast:
+                    case LangBnf.WordForm.VerbPast:
                         wordColumn = "verb_past";
                         spokenRecColumn = "verb_past_spoken_rec";
                         spokenSynthColumn = "verb_past_spoken_synth";
@@ -564,27 +547,27 @@ namespace AIDevServer
             string verbSingular, string verbSingularSpokenRec, string verbSingularSpokenSynth,
             string verbPast, string verbPastSpokenRec, string verbPastSpokenSynth)
         {
-            type = LangBNF.GetBNFType(type);
+            type = LangBnf.GetBnfType(type);
 
-            int rule = LangBNF.LexRules.FindIndex(
+            int rule = LangBnf.LexRules.FindIndex(
                     lexRule => lexRule.Token == type);
-            LangBNF.LexRules[rule].Clauses.Add(new LangBNF.LexClause(true, temp));
-            int clause = LangBNF.LexRules[rule].Clauses.Count - 1;
-            LangBNF.LexRules[rule].Clauses[clause].Items.Add(
-                new LangBNF.LexItem(word, wordSpokenRec,
+            LangBnf.LexRules[rule].Clauses.Add(new LangBnf.LexClause(true, temp));
+            int clause = LangBnf.LexRules[rule].Clauses.Count - 1;
+            LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                new LangBnf.LexItem(word, wordSpokenRec,
                 wordSpokenSynth));
 
             switch (type)
             {
                 case "class_noun":
-                    LangBNF.LexRules[rule].Clauses[clause].Items.Add(new LangBNF.LexItem(
+                    LangBnf.LexRules[rule].Clauses[clause].Items.Add(new LangBnf.LexItem(
                         nounPlural, nounPluralSpokenRec, nounPluralSpokenSynth));
                     break;
                 case "intrans_verb":
                 case "trans_verb":
-                    LangBNF.LexRules[rule].Clauses[clause].Items.Add(new LangBNF.LexItem(
+                    LangBnf.LexRules[rule].Clauses[clause].Items.Add(new LangBnf.LexItem(
                         verbSingular, verbSingularSpokenRec, verbSingularSpokenSynth));
-                    LangBNF.LexRules[rule].Clauses[clause].Items.Add(new LangBNF.LexItem(
+                    LangBnf.LexRules[rule].Clauses[clause].Items.Add(new LangBnf.LexItem(
                         verbPast, verbPastSpokenRec, verbPastSpokenSynth));
                     break;
                 default:
@@ -645,123 +628,6 @@ namespace AIDevServer
             {
                 Console.WriteLine("SQL Server Error, " + error.Message);
                 File.AppendAllText(AppProperties.ServerLogPath, "SQL Error, " + error.Message + "\r\n");
-            }
-        }
-
-        private static LangBNF.WordForm GetWordForm(string word)
-        {
-            LangBNF.WordForm wordForm = LangBNF.WordForm.Base;
-
-            LangBNF.WordLocation wordLocation = FindWordInBNF(word);
-
-            if (wordLocation != null)
-            {
-                if (wordLocation.Item != 0)
-                {
-                    switch (LangBNF.LexRules[wordLocation.Rule].Token)
-                    {
-                        case "class_noun":
-                            wordForm = LangBNF.WordForm.NounPlural;
-                            break;
-                        case "trans_verb":
-                        case "intrans_verb":
-                            if (wordLocation.Item == 1)
-                            {
-                                wordForm = LangBNF.WordForm.VerbSingular;
-                            }
-                            else
-                            {
-                                wordForm = LangBNF.WordForm.VerbPast;
-                            }
-                            break;
-                    }
-                }
-            }
-
-            return wordForm;
-        }
-
-        // Polymorphic alternative 1.
-        // Returns null if word isn't found.
-        private static LangBNF.WordLocation FindWordInBNF(string word)
-        {
-            LangBNF.WordLocation wordLocation = null;
-            bool wordFound = false;
-
-            int rule = 0;
-            while (rule < LangBNF.LexRules.Count && !wordFound)
-            {
-                int clause = 0;
-                while (clause < LangBNF.LexRules[rule].Clauses.Count && !wordFound)
-                {
-                    int item = 0;
-                    while (item < LangBNF.LexRules[rule].Clauses[clause].Items.Count && !wordFound)
-                    {
-                        if (LangBNF.LexRules[rule].Clauses[clause].Items[item].Word == word)
-                        {
-                            wordLocation = new LangBNF.WordLocation
-                            {
-                                Rule = rule,
-                                Clause = clause,
-                                Item = item
-                            };
-                            wordFound = true;
-                        }
-                        item++;
-                    }
-                    clause++;
-                }
-                rule++;
-            }
-
-            return wordLocation;
-        }
-
-        // Polymorphic alternative 2.
-        static bool FindWordInBNF(string word, ref int rule, ref int clause)
-        {
-            int clauseNum;
-            int itemNum;
-            bool wordFound = false;
-
-            int ruleNum = 0;
-            while (wordFound == false && ruleNum < LangBNF.LexRules.Count)
-            {
-                clauseNum = 0;
-                while (wordFound == false && clauseNum < LangBNF.LexRules[ruleNum].Clauses.Count)
-                {
-                    itemNum = 0;
-                    while (wordFound == false &&
-                        itemNum < LangBNF.LexRules[ruleNum].Clauses[clauseNum].Items.Count)
-                    {
-                        if (LangBNF.LexRules[ruleNum].Clauses[clauseNum].Items[itemNum].Word ==
-                            word)
-                        {
-                            wordFound = true;
-                            rule = ruleNum;
-                            clause = clauseNum;
-                        }
-                        itemNum++;
-                    }
-                    clauseNum++;
-                }
-                ruleNum++;
-            }
-
-            return wordFound;
-        }
-
-        static bool WordExists(string word)
-        {
-            LangBNF.WordLocation wordLocation = FindWordInBNF(word);
-
-            if (wordLocation != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
             }
         }
 
@@ -883,51 +749,6 @@ namespace AIDevServer
             return answer;
         }
 
-        private static List<string> GetBaseNouns(int nounPhraNode)
-        {
-            List<string> baseNouns = new List<string>();
-
-            List<Token> subjectTokens = GetTokenSubTreeCopy(astTokens, nounPhraNode);
-
-            for (int token = 0; token < subjectTokens.Count; token++)
-            {
-                if (subjectTokens[token].Name == "class_noun" ||
-                    subjectTokens[token].Name == "disc_obj_noun" ||
-                    subjectTokens[token].Name == "non_disc_obj_noun")
-                {
-                    if (!baseNouns.Contains(subjectTokens[token].Literal))
-                    {
-                        baseNouns.Add(subjectTokens[token].Literal);
-                    }
-                }
-            }
-
-            return baseNouns;
-        }
-
-        // Generates a string representation of the AST subtree of a given node.
-        public static string GetTokenTreeText(List<Token> subTreeTokens, int node)
-        {
-            string text = "";
-            int child = 0;
-
-            if (subTreeTokens[node].Terminal == false)
-            {
-                child = 0;
-                while (child < subTreeTokens[node].Children.Count)
-                {
-                    text = text + GetTokenTreeText(subTreeTokens, subTreeTokens[node].Children[child]);
-                    child = child + 1;
-                }
-            }
-            else
-            {
-                text = text + " " + subTreeTokens[node].Literal;
-            }
-
-            return text;
-        }
-
         private static void GetStmt(ref Stmt stmt, int node)
         {
             stmt.ASTNode = node;
@@ -938,29 +759,20 @@ namespace AIDevServer
                 case "decl_stmt":
                     break;
                 case "query_stmt":
-                    stmt.Query = new QueryStmt();
-                    GetQueryStmt(stmt.Query, node);
+                    stmt.Query = GetQueryStmt(node);
                     break;
                 case "imperative_stmt":
-                    stmt.ImperStmt = new ImperativeStmt();
-                    GetImperativeStmt(stmt.ImperStmt, node);
+                    stmt.ImperStmt = GetImperativeStmt(node);
                     break;
                 default:
                     break;
             }
         }
 
-        private static List<Token> GetTokenSubTreeCopy(List<Token> treeTokens, int startNode)
+        private static QueryStmt GetQueryStmt(int node)
         {
-            List<Token> subTreeTokens = new List<Token>();
+            QueryStmt queryStmt = new QueryStmt();
 
-            CopyTokenSubTree(treeTokens, subTreeTokens, startNode);
-
-            return subTreeTokens;
-        }
-
-        private static void GetQueryStmt(QueryStmt queryStmt, int node)
-        {
             if (astTokens[astTokens[node].Children[0]].Name == "truthof")
             {
                 queryStmt.Type = "truthof";
@@ -974,6 +786,8 @@ namespace AIDevServer
                 // Subject is first child.
                 queryStmt.SubjectNode = astTokens[node].Children[0];
             }
+
+            return queryStmt;
         }
 
         private static string GetQueryType(int node)
@@ -997,8 +811,9 @@ namespace AIDevServer
             return type;
         }
 
-        private static void GetImperativeStmt(ImperativeStmt imperStmt, int node)
+        private static ImperativeStmt GetImperativeStmt(int node)
         {
+            ImperativeStmt imperStmt = new ImperativeStmt();
             int childNode;
 
             if (astTokens[astTokens[node].Children[0]].Name == "find")
@@ -1024,6 +839,170 @@ namespace AIDevServer
             //    public string Command;  // "find", etc.
             //    public int SubjectNode;
             //}
+
+            return imperStmt;
+        }
+
+        private static List<string> GetBaseNouns(int nounPhraNode)
+        {
+            List<string> baseNouns = new List<string>();
+
+            List<Token> subjectTokens = GetTokenSubTreeCopy(astTokens, nounPhraNode);
+
+            for (int token = 0; token < subjectTokens.Count; token++)
+            {
+                if (subjectTokens[token].Name == "class_noun" ||
+                    subjectTokens[token].Name == "disc_obj_noun" ||
+                    subjectTokens[token].Name == "non_disc_obj_noun")
+                {
+                    if (!baseNouns.Contains(subjectTokens[token].Literal))
+                    {
+                        baseNouns.Add(subjectTokens[token].Literal);
+                    }
+                }
+            }
+
+            return baseNouns;
+        }
+
+        private static LangBnf.WordForm GetWordForm(string word)
+        {
+            LangBnf.WordForm wordForm = LangBnf.WordForm.Base;
+
+            LangBnf.WordLocation wordLocation = FindWordInBNF(word);
+
+            if (wordLocation != null)
+            {
+                if (wordLocation.Item != 0)
+                {
+                    switch (LangBnf.LexRules[wordLocation.Rule].Token)
+                    {
+                        case "class_noun":
+                            wordForm = LangBnf.WordForm.NounPlural;
+                            break;
+                        case "trans_verb":
+                        case "intrans_verb":
+                            if (wordLocation.Item == 1)
+                            {
+                                wordForm = LangBnf.WordForm.VerbSingular;
+                            }
+                            else
+                            {
+                                wordForm = LangBnf.WordForm.VerbPast;
+                            }
+                            break;
+                    }
+                }
+            }
+
+            return wordForm;
+        }
+
+        // Polymorphic alternative 1. Returning location as a struct.
+        // Returns null if word isn't found.
+        private static LangBnf.WordLocation FindWordInBNF(string word)
+        {
+            LangBnf.WordLocation wordLocation = null;
+            bool wordFound = false;
+
+            int rule = 0;
+            while (rule < LangBnf.LexRules.Count && !wordFound)
+            {
+                int clause = 0;
+                while (clause < LangBnf.LexRules[rule].Clauses.Count && !wordFound)
+                {
+                    int item = 0;
+                    while (item < LangBnf.LexRules[rule].Clauses[clause].Items.Count && !wordFound)
+                    {
+                        if (LangBnf.LexRules[rule].Clauses[clause].Items[item].Word == word)
+                        {
+                            wordLocation = new LangBnf.WordLocation
+                            {
+                                Rule = rule,
+                                Clause = clause,
+                                Item = item
+                            };
+                            wordFound = true;
+                        }
+                        item++;
+                    }
+                    clause++;
+                }
+                rule++;
+            }
+
+            return wordLocation;
+        }
+
+        // Polymorphic alternative 2. Returning location in parameters passe by reference.
+        static bool FindWordInBNF(string word, ref int rule, ref int clause)
+        {
+            int clauseNum;
+            int itemNum;
+            bool wordFound = false;
+
+            int ruleNum = 0;
+            while (wordFound == false && ruleNum < LangBnf.LexRules.Count)
+            {
+                clauseNum = 0;
+                while (wordFound == false && clauseNum < LangBnf.LexRules[ruleNum].Clauses.Count)
+                {
+                    itemNum = 0;
+                    while (wordFound == false &&
+                        itemNum < LangBnf.LexRules[ruleNum].Clauses[clauseNum].Items.Count)
+                    {
+                        if (LangBnf.LexRules[ruleNum].Clauses[clauseNum].Items[itemNum].Word ==
+                            word)
+                        {
+                            wordFound = true;
+                            rule = ruleNum;
+                            clause = clauseNum;
+                        }
+                        itemNum++;
+                    }
+                    clauseNum++;
+                }
+                ruleNum++;
+            }
+
+            return wordFound;
+        }
+
+        static bool WordExists(string word)
+        {
+            LangBnf.WordLocation wordLocation = FindWordInBNF(word);
+
+            if (wordLocation != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        // Generates a string representation of the AST subtree of a given node.
+        public static string GetTokenTreeText(List<Token> subTreeTokens, int node)
+        {
+            string text = "";
+            int child = 0;
+
+            if (subTreeTokens[node].Terminal == false)
+            {
+                child = 0;
+                while (child < subTreeTokens[node].Children.Count)
+                {
+                    text = text + GetTokenTreeText(subTreeTokens, subTreeTokens[node].Children[child]);
+                    child = child + 1;
+                }
+            }
+            else
+            {
+                text = text + " " + subTreeTokens[node].Literal;
+            }
+
+            return text;
         }
 
         // THIS METHOD IS JUST AN EXAMPLE CALL OF FINDWORDINTREE()
@@ -1059,6 +1038,15 @@ namespace AIDevServer
             }
 
             return wordNodes;
+        }
+
+        private static List<Token> GetTokenSubTreeCopy(List<Token> treeTokens, int startNode)
+        {
+            List<Token> subTreeTokens = new List<Token>();
+
+            CopyTokenSubTree(treeTokens, subTreeTokens, startNode);
+
+            return subTreeTokens;
         }
 
         private static string ParseStmts(string stmtList)
@@ -1215,20 +1203,20 @@ namespace AIDevServer
 
                 if (!IsIdentifierByContext(newToken))
                 {
-                    while ((rule < LangBNF.LexRules.Count) && (identifiedToken == false))
+                    while ((rule < LangBnf.LexRules.Count) && (identifiedToken == false))
                     {
                         clause = 0;
-                        while ((clause < LangBNF.LexRules[rule].Clauses.Count) &&
+                        while ((clause < LangBnf.LexRules[rule].Clauses.Count) &&
                             (identifiedToken == false))
                         {
-                            if (LangBNF.LexRules[rule].Clauses[clause].Items.Count == 1)
+                            if (LangBnf.LexRules[rule].Clauses[clause].Items.Count == 1)
                             {
                                 if (newToken ==
-                                    LangBNF.LexRules[rule].Clauses[clause].Items[0].Word)
+                                    LangBnf.LexRules[rule].Clauses[clause].Items[0].Word)
                                 {
                                     parseTreeTokens.Add(new Token());
                                     parseTreeTokens[numParseTreeTokens].Name =
-                                        LangBNF.LexRules[rule].Token;
+                                        LangBnf.LexRules[rule].Token;
                                     parseTreeTokens[numParseTreeTokens].Terminal = true;
                                     parseTreeTokens[numParseTreeTokens].Literal = newToken;
                                     parseTreeTokens[numParseTreeTokens].Parent = -1;
@@ -1244,9 +1232,9 @@ namespace AIDevServer
                             {
                                 bool matchedItem = false;
                                 int item = 0;
-                                while (item < LangBNF.LexRules[rule].Clauses[clause].Items.Count && matchedItem == false)
+                                while (item < LangBnf.LexRules[rule].Clauses[clause].Items.Count && matchedItem == false)
                                 {
-                                    if (newToken == LangBNF.LexRules[rule].Clauses[clause].Items[item].Word)
+                                    if (newToken == LangBnf.LexRules[rule].Clauses[clause].Items[item].Word)
                                     {
                                         matchedItem = true;
                                     }
@@ -1256,7 +1244,7 @@ namespace AIDevServer
                                 if (matchedItem)
                                 {
                                     parseTreeTokens.Add(new Token());
-                                    parseTreeTokens[numParseTreeTokens].Name = LangBNF.LexRules[rule].Token;
+                                    parseTreeTokens[numParseTreeTokens].Name = LangBnf.LexRules[rule].Token;
                                     parseTreeTokens[numParseTreeTokens].Terminal = true;
                                     parseTreeTokens[numParseTreeTokens].Literal = newToken;
                                     parseTreeTokens[numParseTreeTokens].Parent = -1;
@@ -1264,8 +1252,8 @@ namespace AIDevServer
                                     topTokens.Add(new int());
                                     topTokens[numParseTreeTokens] = numParseTreeTokens;
 
-                                    if (LangBNF.LexRules[rule].Clauses[clause].Items[0].Word !=
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[1].Word)
+                                    if (LangBnf.LexRules[rule].Clauses[clause].Items[0].Word !=
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[1].Word)
                                     {
                                         // This word has a plural option.
                                         parseTreeTokens[numParseTreeTokens].HasPlural = true;
@@ -1275,11 +1263,11 @@ namespace AIDevServer
                                         }
                                     }
 
-                                    if (LangBNF.LexRules[rule].Clauses[clause].Items.Count == 3)
+                                    if (LangBnf.LexRules[rule].Clauses[clause].Items.Count == 3)
                                     {
                                         // This is a verb and has a past tense item.
-                                        if (LangBNF.LexRules[rule].Clauses[clause].Items[0].Word !=
-                                            LangBNF.LexRules[rule].Clauses[clause].Items[2].Word)
+                                        if (LangBnf.LexRules[rule].Clauses[clause].Items[0].Word !=
+                                            LangBnf.LexRules[rule].Clauses[clause].Items[2].Word)
                                         {
                                             // This word has a past-tense option.
                                             parseTreeTokens[numParseTreeTokens].HasPastTense = true;
@@ -1413,7 +1401,7 @@ namespace AIDevServer
                 debugOutput = debugOutput + "\r\nentering ParseTokens\r\n";
             }
 
-            maxPhraseSize = LangBNF.LongestPhraseSize;  // currently 8
+            maxPhraseSize = LangBnf.LongestPhraseSize;  // currently 8
 
             // Repeat parsing of top-level tokens until done.
             while (errorMsg == "" && parseDone == false)
@@ -1570,8 +1558,8 @@ namespace AIDevServer
                             // Decide reduce on higher precedence rule first. If no reduce, try next rule.
                             int firstRule;
                             int secondRule;
-                            if (LangBNF.LangRules[rulesFound[0]].Precedence <
-                                LangBNF.LangRules[rulesFound[1]].Precedence)
+                            if (LangBnf.LangRules[rulesFound[0]].Precedence <
+                                LangBnf.LangRules[rulesFound[1]].Precedence)
                             {
                                 firstRule = rulesFound[0];
                                 secondRule = rulesFound[1];
@@ -1782,7 +1770,7 @@ namespace AIDevServer
             int ruleSearchResult, ref string errorMsg)
         {
             bool allowReduce = true;
-            string ruleName = LangBNF.LangRules[ruleSearchResult].Token;
+            string ruleName = LangBnf.LangRules[ruleSearchResult].Token;
 
             switch (ruleName)
             {
@@ -2172,7 +2160,7 @@ namespace AIDevServer
             int parent;
             bool reduceToExistingToken = false;
 
-            string ruleName = LangBNF.LangRules[ruleNum].Token;
+            string ruleName = LangBnf.LangRules[ruleNum].Token;
 
             if (debugOn)
             {
@@ -2180,7 +2168,7 @@ namespace AIDevServer
                     GetTokenString(startPos, tokenStringLength) + "\r\n";
             }
 
-            if (LangBNF.LangRules[ruleNum].Type == "list" && startPos > 0)
+            if (LangBnf.LangRules[ruleNum].Type == "list" && startPos > 0)
             {
                 if (parseTreeTokens[topTokens[startPos - 1]].Type == "list")
                 {
@@ -2196,7 +2184,7 @@ namespace AIDevServer
                     parent = numParseTreeTokens - 1;
                     parseTreeTokens[parent].Name = ruleName;
                     parseTreeTokens[parent].Terminal = false;
-                    parseTreeTokens[parent].Type = LangBNF.LangRules[ruleNum].Type;
+                    parseTreeTokens[parent].Type = LangBnf.LangRules[ruleNum].Type;
                     parseTreeTokens[parent].Parent = -1;
                 }
             }
@@ -2208,7 +2196,7 @@ namespace AIDevServer
                 parent = numParseTreeTokens - 1;
                 parseTreeTokens[parent].Name = ruleName;
                 parseTreeTokens[parent].Terminal = false;
-                parseTreeTokens[parent].Type = LangBNF.LangRules[ruleNum].Type;
+                parseTreeTokens[parent].Type = LangBnf.LangRules[ruleNum].Type;
                 parseTreeTokens[parent].Parent = -1;
             }
 
@@ -2266,11 +2254,11 @@ namespace AIDevServer
             //    bool test = true;
             //}
 
-            while (ruleNum < LangBNF.LangRules.Count)
+            while (ruleNum < LangBnf.LangRules.Count)
             {
                 clauseNum = 0;
                 //while ((ruleFound == false) && (clauseNum < LangBNF.LangRules[ruleNum].Clauses.Count))
-                while (clauseNum < LangBNF.LangRules[ruleNum].Clauses.Count)
+                while (clauseNum < LangBnf.LangRules[ruleNum].Clauses.Count)
                 {
                     ruleFound = MatchTokenClause(ruleNum, clauseNum, startPos, tokenStringLength);
                     if (ruleFound == true)
@@ -2302,11 +2290,11 @@ namespace AIDevServer
             int tokenNum = 0;
             bool matched = true;
 
-            if (LangBNF.LangRules[ruleNum].Type == "list")
+            if (LangBnf.LangRules[ruleNum].Type == "list")
             {
                 while ((matched == true) && (tokenNum < tokenStringLength))
                 {
-                    if (LangBNF.LangRules[ruleNum].Clauses[clauseNum].Items[0]
+                    if (LangBnf.LangRules[ruleNum].Clauses[clauseNum].Items[0]
                         != parseTreeTokens[topTokens[startPos + tokenNum]].Name)
                     {
                         matched = false;
@@ -2316,12 +2304,12 @@ namespace AIDevServer
             }
             else
             {
-                if (tokenStringLength == LangBNF.LangRules[ruleNum].Clauses[clauseNum].Items.Count)
+                if (tokenStringLength == LangBnf.LangRules[ruleNum].Clauses[clauseNum].Items.Count)
                 {
                     while ((matched == true) && (tokenNum < tokenStringLength) &&
-                        (tokenNum < LangBNF.LangRules[ruleNum].Clauses[clauseNum].Items.Count))
+                        (tokenNum < LangBnf.LangRules[ruleNum].Clauses[clauseNum].Items.Count))
                     {
-                        if (LangBNF.LangRules[ruleNum].Clauses[clauseNum].Items[tokenNum]
+                        if (LangBnf.LangRules[ruleNum].Clauses[clauseNum].Items[tokenNum]
                             != parseTreeTokens[topTokens[startPos + tokenNum]].Name)
                         {
                             matched = false;
@@ -2374,15 +2362,15 @@ namespace AIDevServer
         }
 
         // Generates an Abstract Syntax Tree (AST) from the parse tree.
-        static void GenerateAST()
+        static void GenerateAst()
         {
-            startNewASTPass = true;
+            startNewAstPass = true;
             astTokens = CloneTokenList(parseTreeTokens);
 
-            while (startNewASTPass)
+            while (startNewAstPass)
             {
-                startNewASTPass = false;
-                ConvertNodeToAST(parseTreeRoot, 0);
+                startNewAstPass = false;
+                ConvertNodeToAst(parseTreeRoot, 0);
             }
 
             // Copy the tree node-by-node to remove all unused tokens.
@@ -2393,9 +2381,9 @@ namespace AIDevServer
         }
 
         //static bool ConvertNodeToAST(int node)
-        static void ConvertNodeToAST(int node, int childPosition)
+        static void ConvertNodeToAst(int node, int childPosition)
         {
-            if (!startNewASTPass)
+            if (!startNewAstPass)
             {
                 int currentNode;
                 int childNode;
@@ -2459,7 +2447,7 @@ namespace AIDevServer
                         RemoveOpenCloseSymbolPair(node, childPosition);
                         //backstep = true;
                         //convertChildren = false;
-                        startNewASTPass = true;
+                        startNewAstPass = true;
                         break;
                     // Remove semicolon.
                     case ";":
@@ -2468,9 +2456,9 @@ namespace AIDevServer
                 }
 
                 child = 0;
-                while (child < astTokens[node].Children.Count && startNewASTPass == false)
+                while (child < astTokens[node].Children.Count && startNewAstPass == false)
                 {
-                    ConvertNodeToAST(astTokens[node].Children[child], child);
+                    ConvertNodeToAst(astTokens[node].Children[child], child);
                     child = child + 1;
                 }
             }
@@ -2479,7 +2467,7 @@ namespace AIDevServer
             //    child = 0;
                 //while (child < astTokens[node].Children.Count && restartChildren == false)
                 //{
-                //    restartChildren = ConvertNodeToAST(astTokens[node].Children[child]);
+                //    restartChildren = ConvertNodeToAst(astTokens[node].Children[child]);
                 //    if (restartChildren)
                 //    {
                 //        child = 0;
@@ -2937,18 +2925,18 @@ namespace AIDevServer
         {
             string udWords = "";
 
-            for (int rule = 0; rule < LangBNF.LexRules.Count; rule++)
+            for (int rule = 0; rule < LangBnf.LexRules.Count; rule++)
             {
-                if (LangBNF.LexRules[rule].Token == "adj" ||
-                    LangBNF.LexRules[rule].Token == "disc_obj_noun" ||
-                    LangBNF.LexRules[rule].Token == "non_disc_obj_noun" ||
-                    LangBNF.LexRules[rule].Token == "class_noun" ||
-                    LangBNF.LexRules[rule].Token == "trans_verb" ||
-                    LangBNF.LexRules[rule].Token == "intrans_verb")
+                if (LangBnf.LexRules[rule].Token == "adj" ||
+                    LangBnf.LexRules[rule].Token == "disc_obj_noun" ||
+                    LangBnf.LexRules[rule].Token == "non_disc_obj_noun" ||
+                    LangBnf.LexRules[rule].Token == "class_noun" ||
+                    LangBnf.LexRules[rule].Token == "trans_verb" ||
+                    LangBnf.LexRules[rule].Token == "intrans_verb")
                 {
-                    for (int clause = 0; clause < LangBNF.LexRules[rule].Clauses.Count; clause++)
+                    for (int clause = 0; clause < LangBnf.LexRules[rule].Clauses.Count; clause++)
                     {
-                        if (LangBNF.LexRules[rule].Clauses[clause].UserDefined)
+                        if (LangBnf.LexRules[rule].Clauses[clause].UserDefined)
                         {
                             //type
                             //<temp>
@@ -2967,12 +2955,12 @@ namespace AIDevServer
 
                             // word clause delimiter: NewLine, item delimiter: "|"
 
-                            udWords = udWords + LangBNF.LexRules[rule].Token + "|" +
-                                LangBNF.LexRules[rule].Clauses[clause].Temp + "|" +
-                                LangBNF.LexRules[rule].Clauses[clause].Items[0].Word + "|" +
-                                LangBNF.LexRules[rule].Clauses[clause].Items[0].SpokenRec + "|" +
-                                LangBNF.LexRules[rule].Clauses[clause].Items[0].SpokenSynth + "|";
-                            switch (LangBNF.LexRules[rule].Token)
+                            udWords = udWords + LangBnf.LexRules[rule].Token + "|" +
+                                LangBnf.LexRules[rule].Clauses[clause].Temp + "|" +
+                                LangBnf.LexRules[rule].Clauses[clause].Items[0].Word + "|" +
+                                LangBnf.LexRules[rule].Clauses[clause].Items[0].SpokenRec + "|" +
+                                LangBnf.LexRules[rule].Clauses[clause].Items[0].SpokenSynth + "|";
+                            switch (LangBnf.LexRules[rule].Token)
                             {
                                 case "disc_obj_noun":
                                 case "non_disc_obj_noun":
@@ -2981,20 +2969,20 @@ namespace AIDevServer
                                     break;
                                 case "class_noun":
                                     udWords = udWords +
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[1].Word + "|" +
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[1].SpokenRec + "|" +
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[1].SpokenSynth +
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[1].Word + "|" +
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[1].SpokenRec + "|" +
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[1].SpokenSynth +
                                         "||||||";
                                     break;
                                 case "intrans_verb":
                                 case "trans_verb":
                                     udWords = udWords + "|||" +
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[1].Word + "|" +
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[1].SpokenRec + "|" +
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[1].SpokenSynth + "|" +
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[2].Word + "|" +
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[2].SpokenRec + "|" +
-                                        LangBNF.LexRules[rule].Clauses[clause].Items[2].SpokenSynth;
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[1].Word + "|" +
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[1].SpokenRec + "|" +
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[1].SpokenSynth + "|" +
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[2].Word + "|" +
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[2].SpokenRec + "|" +
+                                        LangBnf.LexRules[rule].Clauses[clause].Items[2].SpokenSynth;
                                     break;
                                 default:
                                     break;
@@ -3030,29 +3018,29 @@ namespace AIDevServer
                 {
                     while (reader.Read())
                     {
-                        bnfType = LangBNF.GetBNFType(reader[0].ToString());
-                        rule = LangBNF.LexRules.FindIndex(
+                        bnfType = LangBnf.GetBnfType(reader[0].ToString());
+                        rule = LangBnf.LexRules.FindIndex(
                             lexRule => lexRule.Token == bnfType);
-                        LangBNF.LexRules[rule].Clauses.Add(new LangBNF.LexClause(true, false));
-                        clause = LangBNF.LexRules[rule].Clauses.Count - 1;
-                        LangBNF.LexRules[rule].Clauses[clause].Items.Add(
-                            new LangBNF.LexItem(reader[1].ToString(), reader[2].ToString(),
+                        LangBnf.LexRules[rule].Clauses.Add(new LangBnf.LexClause(true, false));
+                        clause = LangBnf.LexRules[rule].Clauses.Count - 1;
+                        LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                            new LangBnf.LexItem(reader[1].ToString(), reader[2].ToString(),
                             reader[3].ToString()));
 
                         switch (bnfType)
                         {
                             case "class_noun":
-                                LangBNF.LexRules[rule].Clauses[clause].Items.Add(
-                                    new LangBNF.LexItem(reader[4].ToString(), reader[5].ToString(),
+                                LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                                    new LangBnf.LexItem(reader[4].ToString(), reader[5].ToString(),
                                     reader[6].ToString()));
                                 break;
                             case "intrans_verb":
                             case "trans_verb":
-                                LangBNF.LexRules[rule].Clauses[clause].Items.Add(
-                                    new LangBNF.LexItem(reader[7].ToString(), reader[8].ToString(),
+                                LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                                    new LangBnf.LexItem(reader[7].ToString(), reader[8].ToString(),
                                     reader[9].ToString()));
-                                LangBNF.LexRules[rule].Clauses[clause].Items.Add(
-                                    new LangBNF.LexItem(reader[10].ToString(), reader[11].ToString(),
+                                LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                                    new LangBnf.LexItem(reader[10].ToString(), reader[11].ToString(),
                                     reader[12].ToString()));
                                 break;
                             default:
@@ -3074,19 +3062,19 @@ namespace AIDevServer
 
             languageDefinition = "Language Rules:\r\n\r\n";
             
-            for (int rule = 0; rule < LangBNF.LangRules.Count; rule++)
+            for (int rule = 0; rule < LangBnf.LangRules.Count; rule++)
             {
                 if (simpleVersion)
                 {
-                    languageDefinition = languageDefinition + LangBNF.LangRules[rule].Token + "\r\n";
+                    languageDefinition = languageDefinition + LangBnf.LangRules[rule].Token + "\r\n";
                 }
                 else
                 {
                     languageDefinition = languageDefinition + "Rule [" + rule.ToString().PadLeft(3) + "] " +
-                        LangBNF.LangRules[rule].Token + "\r\n";
+                        LangBnf.LangRules[rule].Token + "\r\n";
                 }
 
-                for (int clause = 0; clause < LangBNF.LangRules[rule].Clauses.Count; clause++)
+                for (int clause = 0; clause < LangBnf.LangRules[rule].Clauses.Count; clause++)
                 {
                     if (simpleVersion)
                     {
@@ -3098,37 +3086,37 @@ namespace AIDevServer
                         "\r\n";
                     }
 
-                    for (int item = 0; item < LangBNF.LangRules[rule].Clauses[clause].Items.Count; item++)
+                    for (int item = 0; item < LangBnf.LangRules[rule].Clauses[clause].Items.Count; item++)
                     {
                         if (simpleVersion)
                         {
                             languageDefinition = languageDefinition + "\t\t" + 
-                                LangBNF.LangRules[rule].Clauses[clause].Items[item] + "\r\n";
+                                LangBnf.LangRules[rule].Clauses[clause].Items[item] + "\r\n";
                         }
                         else
                         {
                             languageDefinition = languageDefinition + "\t\tItem [" + item.ToString().PadLeft(2) + "] " +
-                                LangBNF.LangRules[rule].Clauses[clause].Items[item] + "\r\n";
+                                LangBnf.LangRules[rule].Clauses[clause].Items[item] + "\r\n";
                         }
                     }
                 }
             }
 
             languageDefinition = languageDefinition + "\r\nLexical Rules:\r\n\r\n";
-            for (int rule = 0; rule < LangBNF.LexRules.Count; rule++)
+            for (int rule = 0; rule < LangBnf.LexRules.Count; rule++)
             {
                 if (simpleVersion)
                 {
-                    languageDefinition = languageDefinition + LangBNF.LexRules[rule].Token + "\r\n";
+                    languageDefinition = languageDefinition + LangBnf.LexRules[rule].Token + "\r\n";
                 }
                 else
                 {
                     languageDefinition = languageDefinition + "Rule [" + 
                         rule.ToString().PadLeft(3) + "] " +
-                        LangBNF.LexRules[rule].Token + "\r\n";
+                        LangBnf.LexRules[rule].Token + "\r\n";
                 }
 
-                for (int clause = 0; clause < LangBNF.LexRules[rule].Clauses.Count; clause++)
+                for (int clause = 0; clause < LangBnf.LexRules[rule].Clauses.Count; clause++)
                 {
                     if (simpleVersion)
                     {
@@ -3141,18 +3129,18 @@ namespace AIDevServer
                     }
 
                     languageDefinition = languageDefinition + 
-                        LangBNF.LexRules[rule].Clauses[clause].Items[0].Word;
+                        LangBnf.LexRules[rule].Clauses[clause].Items[0].Word;
 
-                    for (int item = 1; item < LangBNF.LexRules[rule].Clauses[clause].Items.Count; 
+                    for (int item = 1; item < LangBnf.LexRules[rule].Clauses[clause].Items.Count; 
                         item++)
                     {
                         languageDefinition = languageDefinition + ", " +
-                            LangBNF.LexRules[rule].Clauses[clause].Items[item].Word;
+                            LangBnf.LexRules[rule].Clauses[clause].Items[item].Word;
                     }
 
                     languageDefinition = languageDefinition + "\r\n\t(UD: " +
-                        LangBNF.LexRules[rule].Clauses[clause].UserDefined +
-                        ", Temp: " + LangBNF.LexRules[rule].Clauses[clause].Temp + ")\r\n";
+                        LangBnf.LexRules[rule].Clauses[clause].UserDefined +
+                        ", Temp: " + LangBnf.LexRules[rule].Clauses[clause].Temp + ")\r\n";
                 }
             }
 
@@ -3314,7 +3302,7 @@ namespace AIDevServer
 
         public void AddWord(string word, bool temporary)
         {
-            KnowledgeWord newWord = GetWordFromBNF(word);
+            KnowledgeWord newWord = GetWordFromBnf(word);
             newWord.Temporary = temporary;
 
             if (!Words.Exists(item => item.Name == newWord.Name))
@@ -3327,7 +3315,7 @@ namespace AIDevServer
         {
             string wordBase = "";
 
-            KnowledgeWord knowledgeWord = GetWordFromBNF(word);
+            KnowledgeWord knowledgeWord = GetWordFromBnf(word);
 
             if (knowledgeWord.Name != "")
             {
@@ -3338,33 +3326,33 @@ namespace AIDevServer
         }
 
         // CONVERT TO LAMBDA EXPRESSIONS TO SIMPLIFY.
-        private KnowledgeWord GetWordFromBNF(string word)
+        private KnowledgeWord GetWordFromBnf(string word)
         {
             KnowledgeWord newWord = new KnowledgeWord();
 
             int rule = 0;
-            while (rule < LangBNF.LexRules.Count && newWord.Name == "")
+            while (rule < LangBnf.LexRules.Count && newWord.Name == "")
             {
                 int clause = 0;
-                while (clause < LangBNF.LexRules[rule].Clauses.Count && newWord.Name == "")
+                while (clause < LangBnf.LexRules[rule].Clauses.Count && newWord.Name == "")
                 {
                     int item = 0;
-                    while (item < LangBNF.LexRules[rule].Clauses[clause].Items.Count && newWord.Name == "")
+                    while (item < LangBnf.LexRules[rule].Clauses[clause].Items.Count && newWord.Name == "")
                     {
-                        if (LangBNF.LexRules[rule].Clauses[clause].Items[item].Word == word)
+                        if (LangBnf.LexRules[rule].Clauses[clause].Items[item].Word == word)
                         {
-                            newWord.Type = LangBNF.LexRules[rule].Token;
-                            newWord.Name = LangBNF.LexRules[rule].Clauses[clause].Items[0].Word;
+                            newWord.Type = LangBnf.LexRules[rule].Token;
+                            newWord.Name = LangBnf.LexRules[rule].Clauses[clause].Items[0].Word;
 
-                            switch (LangBNF.LexRules[rule].Token)
+                            switch (LangBnf.LexRules[rule].Token)
                             {
                                 case "classnoun":
-                                    newWord.NounPlural = LangBNF.LexRules[rule].Clauses[clause].Items[1].Word;
+                                    newWord.NounPlural = LangBnf.LexRules[rule].Clauses[clause].Items[1].Word;
                                     break;
                                 case "intransverb":
                                 case "transverb":
-                                    newWord.VerbSingular = LangBNF.LexRules[rule].Clauses[clause].Items[1].Word;
-                                    newWord.VerbPast = LangBNF.LexRules[rule].Clauses[clause].Items[2].Word;
+                                    newWord.VerbSingular = LangBnf.LexRules[rule].Clauses[clause].Items[1].Word;
+                                    newWord.VerbPast = LangBnf.LexRules[rule].Clauses[clause].Items[2].Word;
                                     break;
                             }
                         }

@@ -52,7 +52,7 @@ namespace AIDev
             tabWorkspace.Items.Remove(tabItemCommands);
             tabWorkspace.Items.Insert(0, tabItemCommands);
             
-            LangBNF.LoadLexRules();
+            LangBnf.LoadLexRules();
             LoadUDWords();
 
             string loadSynthResult = "";
@@ -102,13 +102,13 @@ namespace AIDev
             }
             else
             {
-                string response = TCPConnection.SendMessage("processstatements " + statements);
+                string response = TcpConnection.SendMessage("processstatements " + statements);
 
                 if (response == "RefreshUDWords")
                 {
                     // Maybe split pronunciations out of AddRecRulesFromLexRules, since they are
                     // for spokenSynth and can be added separately just for voice synth.
-                    LangBNF.LoadLexRules();
+                    LangBnf.LoadLexRules();
                     LoadUDWords();
 
                     if (checkBoxVoiceRecogition.IsChecked == true)
@@ -141,7 +141,7 @@ namespace AIDev
 
         private void LoadUDWords()
         {
-            string udWords = TCPConnection.SendMessage("getudwords");
+            string udWords = TcpConnection.SendMessage("getudwords");
             int rule;
             int clause;
 
@@ -156,28 +156,28 @@ namespace AIDev
             {
                 // There is a new line of data. Process it.
                 wordFields = words[i].Split('|');
-                rule = LangBNF.LexRules.FindIndex(
+                rule = LangBnf.LexRules.FindIndex(
                     lexRule => lexRule.Token == wordFields[0]);
-                LangBNF.LexRules[rule].Clauses.Add(new LangBNF.LexClause(true, wordFields[1] == "true"));
-                clause = LangBNF.LexRules[rule].Clauses.Count - 1;
-                LangBNF.LexRules[rule].Clauses[clause].Items.Add(
-                    new LangBNF.LexItem(wordFields[2], wordFields[3],
+                LangBnf.LexRules[rule].Clauses.Add(new LangBnf.LexClause(true, wordFields[1] == "true"));
+                clause = LangBnf.LexRules[rule].Clauses.Count - 1;
+                LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                    new LangBnf.LexItem(wordFields[2], wordFields[3],
                     wordFields[4]));
 
                 switch (wordFields[0])
                 {
                     case "class_noun":
-                        LangBNF.LexRules[rule].Clauses[clause].Items.Add(
-                            new LangBNF.LexItem(wordFields[5], wordFields[6],
+                        LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                            new LangBnf.LexItem(wordFields[5], wordFields[6],
                             wordFields[7]));
                         break;
                     case "intrans_verb":
                     case "trans_verb":
-                        LangBNF.LexRules[rule].Clauses[clause].Items.Add(
-                            new LangBNF.LexItem(wordFields[8], wordFields[9],
+                        LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                            new LangBnf.LexItem(wordFields[8], wordFields[9],
                             wordFields[10]));
-                        LangBNF.LexRules[rule].Clauses[clause].Items.Add(
-                            new LangBNF.LexItem(wordFields[11], wordFields[12],
+                        LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                            new LangBnf.LexItem(wordFields[11], wordFields[12],
                             wordFields[13]));
                         break;
                     default:

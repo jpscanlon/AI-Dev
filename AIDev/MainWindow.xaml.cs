@@ -17,8 +17,8 @@ namespace AIDev
         {
             InitializeComponent();
 
-            menuItemTestTCPConnect.IsEnabled = true;
-            menuItemTestTCPDisconnect.IsEnabled = false;
+            menuItemTestTcpConnect.IsEnabled = true;
+            menuItemTestTcpDisconnect.IsEnabled = false;
 
             tabWorkspace.AllowDrop = true;
 
@@ -51,12 +51,12 @@ namespace AIDev
 
             //StartServer();
             //Thread.Sleep(1000);  // Wait for server to start listening for new connection requests. Useful?
-            //TCPConnection.SendMessage("serverconnect");  // Reset server connection.
-            TCPConnect();
+            //TcpConnection.SendMessage("serverconnect");  // Reset server connection.
+            TcpConnect();
 
             menuItemTestStartServer.IsEnabled = false;
-            menuItemTestTCPConnect.IsEnabled = false;
-            menuItemTestTCPDisconnect.IsEnabled = true;
+            menuItemTestTcpConnect.IsEnabled = false;
+            menuItemTestTcpDisconnect.IsEnabled = true;
 
             //ViewNets();
             ViewCommands();
@@ -72,9 +72,9 @@ namespace AIDev
                 string response = "";
 
                 // Close server by sending command.
-                response = TCPConnection.SendMessage("closeserver");
+                response = TcpConnection.SendMessage("closeserver");
 
-                //TCPConnection.Disconnect();
+                //TcpConnection.Disconnect();
 
                 // Close server by closing process.
                 serverProcess.CloseMainWindow();
@@ -88,33 +88,33 @@ namespace AIDev
         // If server isn't running, start the server.
         private void StartServer()
         {
-            //if (TCPConnection.TestConnection() == "server connected")
+            //if (TcpConnection.TestConnection() == "server connected")
             //{
             //    // Server is already running.
-            //    menuItemTestTCPDisconnect.IsEnabled = true;
+            //    menuItemTestTcpDisconnect.IsEnabled = true;
             //}
             //else
             {
                 // Start server and connect.
                 serverProcess = Process.Start(AppProperties.ServerPath);  // Start the AI Dev Server.
-                TCPConnect();
+                TcpConnect();
                 menuItemTestStartServer.IsEnabled = false;
                 menuItemTestCloseServer.IsEnabled = true;
-                menuItemTestTCPConnect.IsEnabled = false;
-                menuItemTestTCPDisconnect.IsEnabled = true;
-                menuItemTestTCPMessage.IsEnabled = true;
+                menuItemTestTcpConnect.IsEnabled = false;
+                menuItemTestTcpDisconnect.IsEnabled = true;
+                menuItemTestTcpMessage.IsEnabled = true;
 
             }
         }
 
-        private string TCPConnect()
+        private string TcpConnect()
         {
             string response = "";
-            response = TCPConnection.Connect();
+            response = TcpConnection.Connect();
             
-            menuItemTestTCPConnect.IsEnabled = false;
-            menuItemTestTCPDisconnect.IsEnabled = true;
-            menuItemTestTCPMessage.IsEnabled = true;
+            menuItemTestTcpConnect.IsEnabled = false;
+            menuItemTestTcpDisconnect.IsEnabled = true;
+            menuItemTestTcpMessage.IsEnabled = true;
 
             //MessageBox.Show("TCP Connection result: \r\n" + response);
 
@@ -137,7 +137,7 @@ namespace AIDev
         private void MenuItemFileOpenKB_Click(object sender, RoutedEventArgs e)
         {
             string response = "";
-            response = TCPConnection.SendMessage("openkb");
+            response = TcpConnection.SendMessage("openkb");
             //MessageBox.Show("Server response: " + response);
         }
 
@@ -169,8 +169,8 @@ namespace AIDev
             string response = "";
 
             // Try to clear client stream.
-            //response = TCPConnection.SendMessage("clearstream");
-            response = TCPConnection.ClearClientStream();
+            //response = TcpConnection.SendMessage("clearstream");
+            response = TcpConnection.ClearClientStream();
 
             MessageBox.Show("Server response: " + response);
         }
@@ -183,51 +183,51 @@ namespace AIDev
         private void MenuItemTestCloseServer_Click(object sender, RoutedEventArgs e)
         {
             string response = "";
-            response = TCPConnection.SendMessage("closeserver");
+            response = TcpConnection.SendMessage("closeserver");
 
             menuItemTestStartServer.IsEnabled = true;
             menuItemTestCloseServer.IsEnabled = false;
-            menuItemTestTCPConnect.IsEnabled = false;
-            menuItemTestTCPDisconnect.IsEnabled = false;
-            menuItemTestTCPMessage.IsEnabled = false;
+            menuItemTestTcpConnect.IsEnabled = false;
+            menuItemTestTcpDisconnect.IsEnabled = false;
+            menuItemTestTcpMessage.IsEnabled = false;
 
             //MessageBox.Show("Server response: " + response);
         }
 
-        private void MenuItemTestTCPConnect_Click(object sender, RoutedEventArgs e)
+        private void MenuItemTestTcpConnect_Click(object sender, RoutedEventArgs e)
         {
             string response = "";
-            response = TCPConnect();
+            response = TcpConnect();
             MessageBox.Show("TCP Connection result: \r\n" + response);
         }
 
-        private void MenuItemTestTCPDisconnect_Click(object sender, RoutedEventArgs e)
+        private void MenuItemTestTcpDisconnect_Click(object sender, RoutedEventArgs e)
         {
             string response = "";
-            response = TCPConnection.Disconnect();
-            menuItemTestTCPConnect.IsEnabled = true;
-            menuItemTestTCPDisconnect.IsEnabled = false;
-            menuItemTestTCPMessage.IsEnabled = false;
+            response = TcpConnection.Disconnect();
+            menuItemTestTcpConnect.IsEnabled = true;
+            menuItemTestTcpDisconnect.IsEnabled = false;
+            menuItemTestTcpMessage.IsEnabled = false;
             MessageBox.Show("Server response: " + response);
         }
 
-        private void MenuItemTestTCPMessage_Click(object sender, RoutedEventArgs e)
+        private void MenuItemTestTcpMessage_Click(object sender, RoutedEventArgs e)
         {
             string response = "";
-            response = TCPConnection.SendMessage("test message");
+            response = TcpConnection.SendMessage("test message");
             MessageBox.Show("Server response: " + response);
         }
 
         private void MenuItemWriteToLog_Click(object sender, RoutedEventArgs e)
         {
             string response = "";
-            response = TCPConnection.SendMessage("writetolog");
+            response = TcpConnection.SendMessage("writetolog");
         }
 
         private void MenuClearLog_Click(object sender, RoutedEventArgs e)
         {
             string response = "";
-            response = TCPConnection.SendMessage("clearlog");
+            response = TcpConnection.SendMessage("clearlog");
         }
 
         private void MenuItemTestCode_Click(object sender, RoutedEventArgs e)
@@ -235,8 +235,8 @@ namespace AIDev
             //ViewNet("UCAlpha");
 
             string response = "";
-            response = TCPConnection.SendMessage("runcode");
-            //response = TCPConnection.SendMessage("geterrorhistory");
+            response = TcpConnection.SendMessage("runcode");
+            //response = TcpConnection.SendMessage("geterrorhistory");
             //UpdateTrainingPlot(response);
 
             //MessageBox.Show("Server response: " + response);
@@ -247,7 +247,7 @@ namespace AIDev
         private void MenuItemTestSQLStatement_Click(object sender, RoutedEventArgs e)
         {
             string response = "";
-            response = TCPConnection.SendMessage("runsql");
+            response = TcpConnection.SendMessage("runsql");
             //MessageBox.Show("Server response: " + response);
         }
 

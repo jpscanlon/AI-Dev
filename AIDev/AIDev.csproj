@@ -152,13 +152,10 @@
     <Compile Include="..\Common.cs">
       <Link>Common.cs</Link>
     </Compile>
-    <Compile Include="..\LangBNF.cs">
-      <Link>LangBNF.cs</Link>
-    </Compile>
     <Compile Include="CommandsTab.cs" />
     <Compile Include="NetsTab.cs" />
     <Compile Include="Speech.cs" />
-    <Compile Include="TCPConnection.cs" />
+    <Compile Include="TcpConnection.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -220,8 +217,6 @@
   <ItemGroup>
     <Resource Include="AI Dev Icon - Blocks Assembly.ico" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="LangBNF\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

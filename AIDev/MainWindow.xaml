@@ -89,17 +89,17 @@
                 <MenuItem x:Name="menuItemTestStartServer" Header="Start Server" Click="MenuItemTestStartServer_Click"/>
                 <MenuItem x:Name="menuItemTestCloseServer" Header="Close Server" Click="MenuItemTestCloseServer_Click"/>
                 <Separator/>
-                <MenuItem x:Name="menuItemTestTCPConnect" Header="TCP Connect" Click="MenuItemTestTCPConnect_Click">
+                <MenuItem x:Name="menuItemTestTcpConnect" Header="TCP Connect" Click="MenuItemTestTcpConnect_Click">
                     <MenuItem.Icon>
                         <Image Source="C:\Windows\VS2017 Image Library\VS2017\ConnectToRemoteServer\ConnectToRemoteServer_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="menuItemTestTCPDisconnect" Header="TCP Disconnect" Click="MenuItemTestTCPDisconnect_Click">
+                <MenuItem x:Name="menuItemTestTcpDisconnect" Header="TCP Disconnect" Click="MenuItemTestTcpDisconnect_Click">
                     <MenuItem.Icon>
                         <Image Source="C:\Windows\VS2017 Image Library\VS2017\Disconnect\Disconnect_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="menuItemTestTCPMessage" Header="TCP Message" Click="MenuItemTestTCPMessage_Click">
+                <MenuItem x:Name="menuItemTestTcpMessage" Header="TCP Message" Click="MenuItemTestTcpMessage_Click">
                     <MenuItem.Icon>
                         <Image Source="C:\Windows\VS2017 Image Library\VS2017\ServerRunTest\ServerRunTest_16x.png"/>
                     </MenuItem.Icon>
