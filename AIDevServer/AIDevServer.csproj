@@ -88,13 +88,11 @@
     <Compile Include="..\Common.cs">
       <Link>Common.cs</Link>
     </Compile>
+    <Compile Include="..\LangBnf.cs">
+      <Link>LangBnf.cs</Link>
+    </Compile>
     <Compile Include="Net.cs" />
     <Compile Include="Knowledgebase.cs" />
-    <Compile Include="KnowledgebaseDataSet.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>KnowledgebaseDataSet.xsd</DependentUpon>
-    </Compile>
     <Compile Include="Language.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -109,17 +107,6 @@
   <ItemGroup>
     <None Include="AIDevServer_TemporaryKey.pfx" />
     <None Include="App.config" />
-    <None Include="KnowledgebaseDataSet.xsc">
-      <DependentUpon>KnowledgebaseDataSet.xsd</DependentUpon>
-    </None>
-    <None Include="KnowledgebaseDataSet.xsd">
-      <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>KnowledgebaseDataSet.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="KnowledgebaseDataSet.xss">
-      <DependentUpon>KnowledgebaseDataSet.xsd</DependentUpon>
-    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

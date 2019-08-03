@@ -169,7 +169,8 @@ namespace AIDevServer
 
                 int rule = -1;
                 int clause = -1;
-                if (FindWordInBNF(word, ref rule, ref clause) == true)
+                int item = -1;
+                if (LangBnf.FindWordInBNF(word, ref rule, ref clause, ref item) == true)
                 {
                     //string type = LangBNF.LexRules[rule].Token;
                     response = response +
@@ -240,7 +241,7 @@ namespace AIDevServer
                 case "classnoun":
                     noun_plural =
                         astTokens[astTokens[node].Children[paramsStart + 2]].Literal;
-                    if (WordExists(noun_plural))
+                    if (LangBnf.WordExistsInBnf(noun_plural))
                     {
                         wordExists = true;
                         duplicateWord = noun_plural;
@@ -250,14 +251,14 @@ namespace AIDevServer
                 case "transverb":
                     verb_singular =
                         astTokens[astTokens[node].Children[paramsStart + 2]].Literal;
-                    if (WordExists(verb_singular))
+                    if (LangBnf.WordExistsInBnf(verb_singular))
                     {
                         wordExists = true;
                         duplicateWord = verb_singular;
                     }
                     verb_past =
                         astTokens[astTokens[node].Children[paramsStart + 3]].Literal;
-                    if (WordExists(verb_past))
+                    if (LangBnf.WordExistsInBnf(verb_past))
                     {
                         wordExists = true;
                         duplicateWord = verb_past;
@@ -267,7 +268,7 @@ namespace AIDevServer
                     break;
             }
 
-            if (WordExists(word))
+            if (LangBnf.WordExistsInBnf(word))
             {
                 wordExists = true;
                 duplicateWord = word;
@@ -303,9 +304,9 @@ namespace AIDevServer
 
             string word = astTokens[astTokens[node].Children[1]].Literal;
 
-            LangBnf.WordLocation wordLocation = FindWordInBNF(word);
+            LangBnf.WordLocationInBnf wordLocation = LangBnf.FindWordInBNF(word);
 
-            if (wordLocation != null)
+            if (wordLocation.Rule != -1)
             {
                 //string type = LangBNF.LexRules[wordLocation.Rule].Token;
                 //if (type == "adj" || type == "disc_obj_noun" || type == "non_disc_obj_noun" ||
@@ -387,7 +388,7 @@ namespace AIDevServer
             //         "kon-trolls"
 
             string word = astTokens[astTokens[node].Children[1]].Literal;
-            if (WordExists(word))
+            if (LangBnf.WordExistsInBnf(word))
             {
                 string spokenRec = null;
                 string spokenSynth = null;
@@ -423,9 +424,9 @@ namespace AIDevServer
 
         private static void UpdateSpokenBNF(string word, string spokenRec, string spokenSynth)
         {
-            LangBnf.WordLocation wordLocation = FindWordInBNF(word);
+            LangBnf.WordLocationInBnf wordLocation = LangBnf.FindWordInBNF(word);
 
-            if (wordLocation != null)
+            if (wordLocation.Rule != -1)
             {
                 // Don't update if parameter is null.
                 if (spokenRec != null)
@@ -869,9 +870,9 @@ namespace AIDevServer
         {
             LangBnf.WordForm wordForm = LangBnf.WordForm.Base;
 
-            LangBnf.WordLocation wordLocation = FindWordInBNF(word);
+            LangBnf.WordLocationInBnf wordLocation = LangBnf.FindWordInBNF(word);
 
-            if (wordLocation != null)
+            if (wordLocation.Rule != -1)  // If word found.
             {
                 if (wordLocation.Item != 0)
                 {
@@ -896,90 +897,6 @@ namespace AIDevServer
             }
 
             return wordForm;
-        }
-
-        // Polymorphic alternative 1. Returning location as a struct.
-        // Returns null if word isn't found.
-        private static LangBnf.WordLocation FindWordInBNF(string word)
-        {
-            LangBnf.WordLocation wordLocation = null;
-            bool wordFound = false;
-
-            int rule = 0;
-            while (rule < LangBnf.LexRules.Count && !wordFound)
-            {
-                int clause = 0;
-                while (clause < LangBnf.LexRules[rule].Clauses.Count && !wordFound)
-                {
-                    int item = 0;
-                    while (item < LangBnf.LexRules[rule].Clauses[clause].Items.Count && !wordFound)
-                    {
-                        if (LangBnf.LexRules[rule].Clauses[clause].Items[item].Word == word)
-                        {
-                            wordLocation = new LangBnf.WordLocation
-                            {
-                                Rule = rule,
-                                Clause = clause,
-                                Item = item
-                            };
-                            wordFound = true;
-                        }
-                        item++;
-                    }
-                    clause++;
-                }
-                rule++;
-            }
-
-            return wordLocation;
-        }
-
-        // Polymorphic alternative 2. Returning location in parameters passe by reference.
-        static bool FindWordInBNF(string word, ref int rule, ref int clause)
-        {
-            int clauseNum;
-            int itemNum;
-            bool wordFound = false;
-
-            int ruleNum = 0;
-            while (wordFound == false && ruleNum < LangBnf.LexRules.Count)
-            {
-                clauseNum = 0;
-                while (wordFound == false && clauseNum < LangBnf.LexRules[ruleNum].Clauses.Count)
-                {
-                    itemNum = 0;
-                    while (wordFound == false &&
-                        itemNum < LangBnf.LexRules[ruleNum].Clauses[clauseNum].Items.Count)
-                    {
-                        if (LangBnf.LexRules[ruleNum].Clauses[clauseNum].Items[itemNum].Word ==
-                            word)
-                        {
-                            wordFound = true;
-                            rule = ruleNum;
-                            clause = clauseNum;
-                        }
-                        itemNum++;
-                    }
-                    clauseNum++;
-                }
-                ruleNum++;
-            }
-
-            return wordFound;
-        }
-
-        static bool WordExists(string word)
-        {
-            LangBnf.WordLocation wordLocation = FindWordInBNF(word);
-
-            if (wordLocation != null)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
         // Generates a string representation of the AST subtree of a given node.

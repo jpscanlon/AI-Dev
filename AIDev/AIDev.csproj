@@ -152,6 +152,9 @@
     <Compile Include="..\Common.cs">
       <Link>Common.cs</Link>
     </Compile>
+    <Compile Include="..\LangBnf.cs">
+      <Link>LangBnf.cs</Link>
+    </Compile>
     <Compile Include="CommandsTab.cs" />
     <Compile Include="NetsTab.cs" />
     <Compile Include="Speech.cs" />

@@ -1740,6 +1740,84 @@ class LangBnf
         return bnfType;
     }
 
+    // Polymorphic alternative 1. Returning location as a struct.
+    // Returns -1 for rule, clause, and item if word not found.
+    public static WordLocationInBnf FindWordInBNF(string word)
+    {
+        WordLocationInBnf wordLocation = new WordLocationInBnf(-1, -1, -1);
+        bool wordFound = false;
+
+        int rule = 0;
+        while (rule < LexRules.Count && !wordFound)
+        {
+            int clause = 0;
+            while (clause < LexRules[rule].Clauses.Count && !wordFound)
+            {
+                int item = 0;
+                while (item < LexRules[rule].Clauses[clause].Items.Count && !wordFound)
+                {
+                    if (LexRules[rule].Clauses[clause].Items[item].Word == word)
+                    {
+                        wordLocation = new WordLocationInBnf(rule, clause, item);
+                        wordFound = true;
+                    }
+                    item++;
+                }
+                clause++;
+            }
+            rule++;
+        }
+
+        return wordLocation;
+    }
+
+    // Polymorphic alternative 2. Returning location with parameters passed by reference.
+    public static bool FindWordInBNF(string word, ref int rule, ref int clause, ref int item)
+    {
+        bool wordFound = false;
+
+        int ruleNum = 0;
+        while (wordFound == false && ruleNum < LexRules.Count)
+        {
+            int clauseNum = 0;
+            while (wordFound == false && clauseNum < LexRules[ruleNum].Clauses.Count)
+            {
+                int itemNum = 0;
+                while (wordFound == false &&
+                    itemNum < LexRules[ruleNum].Clauses[clauseNum].Items.Count)
+                {
+                    if (LexRules[ruleNum].Clauses[clauseNum].Items[itemNum].Word ==
+                        word)
+                    {
+                        rule = ruleNum;
+                        clause = clauseNum;
+                        item = itemNum;
+                        wordFound = true;
+                    }
+                    itemNum++;
+                }
+                clauseNum++;
+            }
+            ruleNum++;
+        }
+
+        return wordFound;
+    }
+
+    public static bool WordExistsInBnf(string word)
+    {
+        WordLocationInBnf wordLocation = FindWordInBNF(word);
+
+        if (wordLocation.Rule != -1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     // Loads item types from item strings into corresponding ItemTypes arrays. For example: takes
     // "[list] adj_unit" and sets the item type to enum ItemType.List, then removes "[list] " from the string.
     // Ordinary items get set to enum ItemType.Simple.
@@ -1859,9 +1937,16 @@ class LangBnf
 
     public struct WordLocationInBnf
     {
-        public int Rule;
-        public int Clause;
-        public int Item;
+        public WordLocationInBnf(int rule, int clause, int item)
+        {
+            Rule = rule;
+            Clause = clause;
+            Item = item;
+        }
+
+        public int Rule { get; }
+        public int Clause { get; }
+        public int Item { get; }
     }
 
     public enum ItemType
