@@ -10,8 +10,9 @@ namespace AIDev
     {
         // These values should eventually be changed from static to dynamic runtime.
         //private static readonly string serverIP = "127.0.0.1";
-        private static IPAddress localIP = Dns.GetHostEntry("localhost").AddressList[0];
+        private static readonly IPAddress localIP = Dns.GetHostEntry("localhost").AddressList[0];
         private static readonly string serverIP = localIP.ToString();
+        //private static readonly int port = 8000;
         private static readonly int port = 13000;
         static TcpClient client = null;
         static NetworkStream clientStream = null;
@@ -70,7 +71,7 @@ namespace AIDev
         public static string Connect()
         {
             //string message = "serverconnect"
-            string result = "";
+            string result;
             //Byte[] data;
 
             try
@@ -136,7 +137,7 @@ namespace AIDev
 
         public static string SendMessage(string message)
         {
-            string response = "";
+            string response;
 
             //ClearClientStream();
 
@@ -168,7 +169,8 @@ namespace AIDev
                     response = responseData;
                     //}
                 }
-                catch (Exception e)
+                //catch (Exception e)
+                catch (Exception)
                 {
                     //MessageBox.Show("Exception: " + e);
                     response = Connect();  // Attempt to reconnect.
@@ -210,7 +212,8 @@ namespace AIDev
                         response = responseData;
                     //}
                 }
-                catch (Exception e)
+                //catch (Exception e)
+                catch (Exception)
                 {
                     //MessageBox.Show("Exception: " + e);
                     //response = Connect();  // Attempt to reconnect.

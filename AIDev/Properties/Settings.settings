@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="AIDevFolderPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">C:\Users\Admin\Data\Dev\AI Dev</Value>
+      <Value Profile="(Default)">C:\Users\User2\Dev\AI Dev</Value>
     </Setting>
     <Setting Name="ttsVoice" Type="System.String" Scope="User">
       <Value Profile="(Default)">Microsoft David Desktop</Value>

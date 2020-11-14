@@ -31,10 +31,10 @@ namespace AIDev
         private static List<SpokenRule> spokenSynthRules;
         private static SrgsDocument document;
 
-        private static List<string> choicesNotInRecRules = new List<string>();
+        private static readonly List<string> choicesNotInRecRules = new List<string>();
 
         public static bool Speaking = false;
-        private static bool OutputRecognitionData = true;
+        private static readonly bool OutputRecognitionData = true;
 
         private Speech()
         {
@@ -116,7 +116,7 @@ namespace AIDev
                 //    speechRecLogOutput = speechRecLogOutput + "\t\t" + replacementWordUnit.Text + "\r\n";
                 //}
 
-                speechRecLogOutput = speechRecLogOutput + "\tWords:\r\n";
+                speechRecLogOutput += "\tWords:\r\n";
                 foreach (RecognizedWordUnit Word in e.Result.Words)
                 {
                     speechRecLogOutput = speechRecLogOutput + "\t\t" + Word.Text + "\r\n";
@@ -133,10 +133,9 @@ namespace AIDev
 
         private static void ProcessRecognizedWord(string recognizedWord)
         {
-            string commandText = recognizedWord;
-            string text = "";
             string logResult = "";
 
+            string commandText;
             switch (recognizedWord)
             {
                 case "space":
@@ -149,7 +148,7 @@ namespace AIDev
                     commandText = "\"";
                     break;
                 default:
-                    text = GetTextFromSpoken(recognizedWord);
+                    string text = GetTextFromSpoken(recognizedWord);
                     if (text != "")
                     {
                         commandText = text;
@@ -248,7 +247,7 @@ namespace AIDev
                     }
                     ((MainWindow)Application.Current.MainWindow).
                         textBoxCommands.AppendText(commandText);
-                    logResult = logResult + commandText;
+                    logResult += commandText;
                     break;
             }
 
@@ -516,20 +515,26 @@ namespace AIDev
             //grammar = new Grammar(document);
 
             // Create an SrgsDocument, create a new rule and set its scope to public.  
-            document = new SrgsDocument();
-            document.PhoneticAlphabet = SrgsPhoneticAlphabet.Ups;
+            document = new SrgsDocument
+            {
+                PhoneticAlphabet = SrgsPhoneticAlphabet.Ups
+            };
             //document.PhoneticAlphabet = SrgsPhoneticAlphabet.Sapi;
 
             //SrgsRule wordRule = (new SrgsRule("word", new SrgsElement[] { oneOfWord }));
-            SrgsRule wordRule = new SrgsRule("word");
-            wordRule.Scope = SrgsRuleScope.Public;
+            SrgsRule wordRule = new SrgsRule("word")
+            {
+                Scope = SrgsRuleScope.Public
+            };
 
             SrgsOneOf oneOfWord = new SrgsOneOf(new SrgsItem[] {new SrgsItem("aardvark"),
                 new SrgsItem("beaver"), new SrgsItem("cheetah")});
 
             SrgsItem wordItem = new SrgsItem();
-            SrgsToken token = new SrgsToken("whatchamacallit");
-            token.Pronunciation = "W AE T CH AE M AE K AA L IH T";
+            SrgsToken token = new SrgsToken("whatchamacallit")
+            {
+                Pronunciation = "W AE T CH AE M AE K AA L IH T"
+            };
             wordItem.Add(token);
             //oneOfWord = new SrgsOneOf();
             oneOfWord.Add(wordItem);

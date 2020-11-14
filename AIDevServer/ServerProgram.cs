@@ -6,7 +6,7 @@ namespace AIDevServer
 {
     class Server
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
             File.WriteAllText(AppProperties.ServerLogPath, "");  // Erase server log file.
 
@@ -32,7 +32,6 @@ namespace AIDevServer
 
             File.AppendAllText(AppProperties.ServerLogPath, "Entering server loop." + 
                 Environment.NewLine);
-            string commands = null;
             bool continueRunning = true;
             // For writing to the console only after a number of passes through the server loop.
             int cycleCount = 0;
@@ -42,7 +41,7 @@ namespace AIDevServer
                     "\r\nServer running...\n");
                 if (cycleCount == 0 || cycleCount == 10) Console.Write("Getting commands...\r\n");
                 Thread.Sleep(100);
-                commands = ServerTCPConnection.HandleConnection();
+                string commands = ServerTCPConnection.HandleConnection();
                 continueRunning = ProcessCommands(commands);
                 cycleCount++;
                 if (cycleCount == 20) cycleCount = 0;
@@ -52,15 +51,16 @@ namespace AIDevServer
             File.AppendAllText(AppProperties.ServerLogPath, "Closing server." + 
                 Environment.NewLine);
             Thread.Sleep(300);
+            return 0;
         }
 
         private static bool ProcessCommands(string commands)
         {
             bool continueRunning = true;
-            string response = "";
             if (commands != null)
             {
                 Console.WriteLine("Commands received [" + commands + "]");
+                string response;
                 //commands = commands.ToLower();
 
                 if (commands == "clearstream")
@@ -153,7 +153,7 @@ namespace AIDevServer
                     ServerTCPConnection.ReturnResponse("training started");
                     //response = Knowledgebase.TrainNet(
                     //    commands.Substring(9, commands.Length - 9));
-                    response = Knowledgebase.TrainNetBackprop(
+                    _ = Knowledgebase.TrainNetBackprop(
                         commands.Substring(9, commands.Length - 9));
                     //ServerTCPConnection.ReturnResponse(response);
                 }
@@ -188,7 +188,6 @@ namespace AIDevServer
 
         public static string RunCode()
         {
-            string response = "error";
 
             //response = Knowledgebase.RunCode();
 
@@ -202,7 +201,9 @@ namespace AIDevServer
             //LangBNF.LexRules[rule].Clauses[clause].Items.Add(
             //    new LangBNF.LexItem("leela"));
 
-            response = Language.GetUDWordsForClient();
+            //response = Language.GetUDWordsForClient();
+
+            string response = _ = Knowledgebase.RunTensorFlow();
 
             //response = "Code was executed.";
 
@@ -236,7 +237,7 @@ namespace AIDevServer
         // (Server path is set in client MainWindow.xaml.cs.)
         // (Installed app still accesses normal development knowledgebase location.)
         //public static string AIDevInstalledFolderPath = 
-        //    @"C:\Users\Admin\Data\Dev\AI Dev Installed";
+        //    @"C:\Users\User2\Dev\AI Dev Installed";
         //public static string AIDevInstalledDataFolderPath = AIDevInstalledFolderPath + 
         //    @"\AIDev Data";
         //public static string AIDevNetsFolderPath = AIDevInstalledDataFolderPath + @"\Nets";

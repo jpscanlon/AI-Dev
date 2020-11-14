@@ -13,16 +13,13 @@ static class Common
     {
         bool NestedMethod()
         {
-            bool testValue1 = true;
-
             {
-                bool testValue2 = false;
-                testValue2 = true;
-                testValue1 = testValue2;
+                bool testValue2 = true;
+                if (testValue2) return true;
             }
 
             //  TestValue2 is out of scope.
-            testValue1 = false;
+            bool testValue1 = false;
             //TestValue2 = false;
 
             return testValue1 || true;
@@ -49,6 +46,7 @@ static class Common
     public static string SerializeToFile(object objectToSerialize, string filePath)
     {
         string error = "";
+
         try
         {
             Stream stream = File.Open(filePath, FileMode.Create);
@@ -66,7 +64,8 @@ static class Common
 
     public static object DeserializeFromFile(string filePath)
     {
-        object deserializedObject = new object();
+        object deserializedObject;
+        _ = new object();
 
         try
         {
@@ -122,7 +121,7 @@ static class Common
             {
                 for (int i = 1; i <= power; i++)
                 {
-                    result = result * value;
+                    result *= value;
                 }
             }
         }
@@ -147,7 +146,7 @@ static class Common
             Bitmap image1;
 
             // Retrieve the image.
-            image1 = new Bitmap(@"C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST\" +
+            image1 = new Bitmap(@"C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST\" +
                     @"mnist_png\testing\0\3.png");
 
             int x, y;

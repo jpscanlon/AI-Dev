@@ -11,11 +11,12 @@ namespace AIDev
     partial class MainWindow
     {
         const string commandsHeader = "AI Dev Jillian Interface\r\n\r\n";
-        private string commandPrompt = "Commands> ";
+        // LINUX TERMINAL DOESN'T USE A SPACE. WINDOWS POWERSHELL DOES, COMMAND PROMPT DOESN'T.
+        private readonly string commandPrompt = ">";
         public int PromptIndex;
         private int lastCaretIndex;
         private string commandsText;
-        private static bool StartWithRecAndSynthOn = false;
+        private static readonly bool StartWithRecAndSynthOn = false;
 
         private void ViewCommands()
         {
@@ -30,7 +31,7 @@ namespace AIDev
             textBoxCommands.HorizontalScrollBarVisibility = 0;
             textBoxCommands.Text = "";
 
-            //commandsText = GetDemoText();
+            //commandsText = GetExampleText();
             commandsText = commandsHeader + commandPrompt;
 
             textBoxCommands.AppendText(commandsText);
@@ -42,11 +43,11 @@ namespace AIDev
             lastCaretIndex = textBoxCommands.CaretIndex;
 
             // Image Control
-            BitmapImage imageSource = new BitmapImage(new Uri(@"C:\Users\Admin\OneDrive\Data\Images\Interesting\readingcouch660x357.jpg",
+            BitmapImage imageSource = new BitmapImage(new Uri(@"C:\Users\User2\Dev\AI Dev\AIDev Resources\Images\readingcouch660x357.jpg",
                 UriKind.RelativeOrAbsolute));
             imageInputImage1.Source = imageSource;
-            //C:\Users\Admin\OneDrive\Data\Images\Interesting\readingcouch660x357.jpg
-            //C:\Users\Admin\OneDrive\Data\Images\Interesting\Psychedelic Explosion.jpg
+            //C:\Users\User2\Dev\AI Dev\AIDev Resources\Images\readingcouch660x357.jpg
+            //C:\Users\User2\Dev\AI Dev\AIDev Resources\Images\Psychedelic Explosion.jpg
 
             // Place in first tab position.
             tabWorkspace.Items.Remove(tabItemCommands);
@@ -56,8 +57,6 @@ namespace AIDev
             LoadUDWords();
 
             string loadSynthResult = "";
-            string loadRecResult = "";
-
             if (StartWithRecAndSynthOn)
             {
                 loadSynthResult = Speech.LoadSpeechSynthesizer();
@@ -66,7 +65,7 @@ namespace AIDev
                     checkBoxVoiceSynth.IsChecked = true;
                 }
 
-                loadRecResult = Speech.LoadSpeechRecognizer();
+                string loadRecResult = Speech.LoadSpeechRecognizer();
                 if (loadRecResult == "")
                 {
                     checkBoxVoiceRecogition.IsChecked = true;
@@ -125,7 +124,7 @@ namespace AIDev
 
                 lastCaretIndex = textBoxCommands.CaretIndex;
                 textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
-                textBoxCommands.AppendText("\r\n\r\n" + response + "\r\n\r\n" + commandPrompt);
+                textBoxCommands.AppendText("\r\n" + response.TrimEnd() + "\r\n\r\n" + commandPrompt);
                 commandsText = textBoxCommands.Text;
                 PromptIndex = textBoxCommands.Text.Length;
                 textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
@@ -142,48 +141,53 @@ namespace AIDev
         private void LoadUDWords()
         {
             string udWords = TcpConnection.SendMessage("getudwords");
-            int rule;
-            int clause;
 
-            string[] words = udWords.Split(
-                new[] { Environment.NewLine },
-                StringSplitOptions.RemoveEmptyEntries
-            );
-
-            string[] wordFields = new string[14];
-            int i = 0;
-            while ((i < words.Length) && (!string.IsNullOrEmpty(words[i])))
+            if (udWords != "not connected")
             {
-                // There is a new line of data. Process it.
-                wordFields = words[i].Split('|');
-                rule = LangBnf.LexRules.FindIndex(
-                    lexRule => lexRule.Token == wordFields[0]);
-                LangBnf.LexRules[rule].Clauses.Add(new LangBnf.LexClause(true, wordFields[1] == "true"));
-                clause = LangBnf.LexRules[rule].Clauses.Count - 1;
-                LangBnf.LexRules[rule].Clauses[clause].Items.Add(
-                    new LangBnf.LexItem(wordFields[2], wordFields[3],
-                    wordFields[4]));
+                int rule;
+                int clause;
 
-                switch (wordFields[0])
+                string[] words = udWords.Split(
+                    new[] { Environment.NewLine },
+                    StringSplitOptions.RemoveEmptyEntries
+                );
+
+                string[] wordFields = new string[14];
+                int i = 0;
+
+                while ((i < words.Length) && (!string.IsNullOrEmpty(words[i])))
                 {
-                    case "class_noun":
-                        LangBnf.LexRules[rule].Clauses[clause].Items.Add(
-                            new LangBnf.LexItem(wordFields[5], wordFields[6],
-                            wordFields[7]));
-                        break;
-                    case "intrans_verb":
-                    case "trans_verb":
-                        LangBnf.LexRules[rule].Clauses[clause].Items.Add(
-                            new LangBnf.LexItem(wordFields[8], wordFields[9],
-                            wordFields[10]));
-                        LangBnf.LexRules[rule].Clauses[clause].Items.Add(
-                            new LangBnf.LexItem(wordFields[11], wordFields[12],
-                            wordFields[13]));
-                        break;
-                    default:
-                        break;
+                    // There is a new line of data. Process it.
+                    wordFields = words[i].Split('|');
+                    rule = LangBnf.LexRules.FindIndex(
+                        lexRule => lexRule.Token == wordFields[0]);
+                    LangBnf.LexRules[rule].Clauses.Add(new LangBnf.LexClause(true, wordFields[1] == "true"));
+                    clause = LangBnf.LexRules[rule].Clauses.Count - 1;
+                    LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                        new LangBnf.LexItem(wordFields[2], wordFields[3],
+                        wordFields[4]));
+
+                    switch (wordFields[0])
+                    {
+                        case "class_noun":
+                            LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                                new LangBnf.LexItem(wordFields[5], wordFields[6],
+                                wordFields[7]));
+                            break;
+                        case "intrans_verb":
+                        case "trans_verb":
+                            LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                                new LangBnf.LexItem(wordFields[8], wordFields[9],
+                                wordFields[10]));
+                            LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                                new LangBnf.LexItem(wordFields[11], wordFields[12],
+                                wordFields[13]));
+                            break;
+                        default:
+                            break;
+                    }
+                    i++;
                 }
-                i++;
             }
         }
 
@@ -193,8 +197,7 @@ namespace AIDev
 
             if (checkBoxVoiceSynth.IsChecked == true)
             {
-                string loadSynthResult = "";
-                loadSynthResult = Speech.LoadSpeechSynthesizer();
+                string loadSynthResult = Speech.LoadSpeechSynthesizer();
 
                 if (loadSynthResult != "")
                 {
@@ -278,8 +281,7 @@ namespace AIDev
         {
             if (Speech.Synth == null)
             {
-                string loadSynthResult = "";
-                loadSynthResult = Speech.LoadSpeechSynthesizer();
+                string loadSynthResult = Speech.LoadSpeechSynthesizer();
 
                 if (loadSynthResult != "")
                 {
@@ -322,11 +324,12 @@ namespace AIDev
         }
 
         // RE-WRITE THIS WITH REALISTIC STATEMENTS AND RESPONSES.
-        private string GetDemoText()
+        private string GetExampleText()
         {
-            string demoText;
+            string exampleText;
 
-            demoText = "[...1....|....2....|....3....|....4....|....5....|....6....|....7....|....8....]\n" +
+            // REDO DEMO TEXT TO SHOW ENVISIONED FUTURE INTERACTION WITH A KNOWLEDGEBASE.
+            exampleText = "[...1....|....2....|....3....|....4....|....5....|....6....|....7....|....8....]\n" +
                 //"---------1---------2---------3---------4---------5---------6---------7---------8---------9--------10\n" +
                 //"[...1....|....2....|....3....|....4....|....5....|....6....|....7....|....8....]" +
                 //"....1....|....2....|....3....|....4....|....5....|....6....|....7....|....8....]\n\n" +
@@ -348,7 +351,7 @@ namespace AIDev
                 "d - r-- - " + "\t" + "7 / 11 / 2018   1:51 PM" + "\t" + "Video\n" +
                 "\n";
 
-            demoText = demoText +
+            exampleText = exampleText +
                 "PS C:\\Users\\Admin > \n" +
                 "\n" +
                 "Commands:\n" +
@@ -370,7 +373,7 @@ namespace AIDev
                 "\n" +
                 commandPrompt;
 
-            return demoText;
+            return exampleText;
         }
 
         private class RecognizerRule

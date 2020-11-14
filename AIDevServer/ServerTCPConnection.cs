@@ -24,6 +24,7 @@ namespace AIDevServer
             try
             {
                 // Start the TcpListener.
+                //int port = 8000;
                 int port = 13000;
                 IPAddress localIP = Dns.GetHostEntry("localhost").AddressList[0];
                 ServerTCPListener = new TcpListener(localIP, port);
@@ -43,8 +44,6 @@ namespace AIDevServer
 
         public static string HandleConnection()
         {
-            string commands = null;
-
             if (client != null)
             {
                 // This doesn't recognize a disconnected client:
@@ -55,6 +54,7 @@ namespace AIDevServer
                 connected = false;
             }
 
+            string commands;
             //if (IsConnectionGood(clientStream) == false) connected = false;
 
             if (connected)
@@ -163,7 +163,7 @@ namespace AIDevServer
             if (string.IsNullOrEmpty(response)) response = "no response";
 
             //Byte[] bytes = new Byte[256];
-            byte[] bytes = new byte[256000];
+            _ = new byte[256000];
 
             byte[] msg = System.Text.Encoding.ASCII.GetBytes(response);
 

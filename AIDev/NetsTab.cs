@@ -19,12 +19,12 @@ namespace AIDev
     {
         List<Net> Nets = new List<Net>();
         int currentNet = -1;
-        //string currentInputImage = @"C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST\mnist_png" +
+        //string currentInputImage = @"C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST\mnist_png" +
         //    @"\training\8\146.png";
-        string currentInputImage = @"C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets" +
-            @"\EMINST - Reduced Sets\mnist_png - (1 & 1)\training\8\41.png";  // All training sets have this image.
-        //EMINST - Reduced Sets\mnist_png - (1 & 1)\training\8\41.png
-        //C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST - Reduced Sets\mnist_png - (1 & 1)\training\8\41.png
+        string currentInputImage = @"C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets" +
+            @"\EMNIST - Reduced Sets\mnist_png - (1 & 1)\training\8\41.png";  // All training sets have this image.
+        //EMNIST - Reduced Sets\mnist_png - (1 & 1)\training\8\41.png
+        //C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST - Reduced Sets\mnist_png - (1 & 1)\training\8\41.png
         DispatcherTimer timerTrainingPlot;
         int getHistoryInterval = 4;
 
@@ -45,8 +45,7 @@ namespace AIDev
 
         private void LoadNetsView()
         {
-            string response = "";
-            response = TcpConnection.SendMessage("getnets");
+            string response = TcpConnection.SendMessage("getnets");
 
             Nets = new List<Net>();  // Try removing creation of a new nets list here.
             // Binding the listview again here seems to be the only way to get the listview to populate.
@@ -167,16 +166,12 @@ namespace AIDev
         {
             bool nameFound = false;
             int netIdx = 0;
-            bool isGrayscale = false;
-
             string command = "opennet \"" + netName + "\"";
-
-            string response = "";
-            
-            response = TcpConnection.SendMessage(command);
+            string response = TcpConnection.SendMessage(command);
 
             if (response != "error")
             {
+                bool isGrayscale;
                 if (response == "True")
                 {
                     isGrayscale = true;
@@ -206,7 +201,7 @@ namespace AIDev
                 }
 
                 if (!nameFound) netIdx = -1;
-                else netIdx = netIdx - 1;
+                else netIdx -= 1;
 
             }
             else
@@ -226,8 +221,7 @@ namespace AIDev
 
         private void CreateNet()
         {
-            string response = "";
-            response = TcpConnection.SendMessage("addnet");
+            string response = TcpConnection.SendMessage("addnet");
 
             if (response != "")
             {
@@ -271,12 +265,8 @@ namespace AIDev
 
         private void StopTraining()
         {
-            string response = "";
-            string command = "";
-
-            command = "stoptraining";
-
-            response = TcpConnection.SendMessage(command);
+            string command = "stoptraining";
+            _ = TcpConnection.SendMessage(command);
             buttonNetStop.IsEnabled = false;
             buttonTrainStop.IsEnabled = false;
             buttonTrainBump.IsEnabled = false;
@@ -323,10 +313,6 @@ namespace AIDev
 
         private void ButtonNetSave_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            string command = "";
-            string descriptionArguments = "";
-            string layerArguments = "";
 
             // Replace this with field validation on text change.
             if (comboBoxNetType.Text == "Convolutional" && Convert.ToInt32(textBoxNetConvLayers.Text) < 1)
@@ -334,13 +320,13 @@ namespace AIDev
                 textBoxNetConvLayers.Text = "1";
             }
 
-            descriptionArguments = "\"" + Nets[currentNet].Name + "\" \"" +
+            string descriptionArguments = "\"" + Nets[currentNet].Name + "\" \"" +
                 textBoxNetName.Text + "\" \"" + comboBoxNetType.Text + "\" \"" +
-                comboBoxNetActivationFunction.Text + "\" \"" + 
+                comboBoxNetActivationFunction.Text + "\" \"" +
                 Convert.ToString(checkBoxNetIsGrayscale.IsChecked) + "\"";
-            layerArguments = textBoxNetInputs.Text + " " + textBoxNetOutputs.Text + " " + 
+            string layerArguments = textBoxNetInputs.Text + " " + textBoxNetOutputs.Text + " " +
                 textBoxNetFCLayers.Text + " " + textBoxNetConvLayers.Text;
-
+            string command;
             if (comboBoxNetType.Text != Nets[currentNet].Type ||
                 textBoxNetInputs.Text != Convert.ToString(Nets[currentNet].NumInputs) ||
                 textBoxNetOutputs.Text != Convert.ToString(Nets[currentNet].NumOutputs) ||
@@ -355,7 +341,7 @@ namespace AIDev
                 command = "updatenet " + descriptionArguments;
             }
 
-            response = TcpConnection.SendMessage(command);
+            string response = TcpConnection.SendMessage(command);
 
             LoadNetsView();
             ViewNet(textBoxNetName.Text);
@@ -379,26 +365,25 @@ namespace AIDev
 
         private void ButtonNetChangeImage_Click(object sender, RoutedEventArgs e)
         {
-            string initialDirectory = @"C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST\mnist_png\";
-            var fileContent = string.Empty;
+            string initialDirectory = @"C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST\mnist_png\";
             const bool ok = true;
 
             switch (comboBoxNetDataset.Text)
             {
                 case "1 Item":
-                    initialDirectory = @"C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST - Reduced Sets\mnist_png - (1 & 1)\";
+                    initialDirectory = @"C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST - Reduced Sets\mnist_png - (1 & 1)\";
                     break;
                 case "2 Items":
-                    initialDirectory = @"C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST - Reduced Sets\mnist_png - (1 & 2)\";
+                    initialDirectory = @"C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST - Reduced Sets\mnist_png - (1 & 2)\";
                     break;
                 case "0.2 Percent":
-                    initialDirectory = @"C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST - Reduced Sets\mnist_png - 0.1 & 0.2 Percent\";
+                    initialDirectory = @"C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST - Reduced Sets\mnist_png - 0.1 & 0.2 Percent\";
                     break;
                 case "2.0 Percent":
-                    initialDirectory = @"C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST - Reduced Sets\mnist_png - 1 & 2 Percent\";
+                    initialDirectory = @"C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST - Reduced Sets\mnist_png - 1 & 2 Percent\";
                     break;
                 case "10.0 Percent":
-                    initialDirectory = @"C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST - Reduced Sets\mnist_png - 10 Percent\";
+                    initialDirectory = @"C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST - Reduced Sets\mnist_png - 10 Percent\";
                     break;
             }
 
@@ -423,12 +408,8 @@ namespace AIDev
 
         private void ButtonNetRun_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            string command = "";
-
-            command = "runnet \"" + currentInputImage + "\"";
-
-            response = TcpConnection.SendMessage(command);
+            string command = "runnet \"" + currentInputImage + "\"";
+            string response = TcpConnection.SendMessage(command);
 
             //MessageBox.Show("Server response: \r\n" + response);
             MessageBox.Show(response);
@@ -436,9 +417,6 @@ namespace AIDev
 
         private void ButtonNetTrain_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            string command = "";
-
             switch (comboBoxNetDataset.Text)
             {
                 case "1 Item":
@@ -458,11 +436,11 @@ namespace AIDev
                     break;
             }
 
-            command = "trainnet";
+            string command = "trainnet";
             string args = '"' + comboBoxNetDataset.Text + "\" \"" + textBoxNetIterationSize.Text + '"';
             command = command + " " + args;
 
-            response = TcpConnection.SendMessage(command);
+            string response = TcpConnection.SendMessage(command);
 
             if (response == "training started")
             {
@@ -482,9 +460,8 @@ namespace AIDev
             timerTrainingPlot.Interval = new TimeSpan(0, 0, getHistoryInterval);
             timerTrainingPlot.Start();
 
-            ViewModels.MainViewModel.Points.Clear();
+            ViewModels.TrainingViewModel.Points.Clear();
             oxyPlotTrainingError.Axes[1].Maximum = 1;
-            //ViewModels.MainViewModel.
             oxyPlotTrainingError.Title = "Training - " + Nets[currentNet].Name;
             //oxyPlotTrainingError.InvalidatePlot(true);
 
@@ -495,9 +472,8 @@ namespace AIDev
 
         private void OnTimedEvent(object sender, EventArgs e)
         {
-            string response = "";
             string dataPointSize;
-            response = TcpConnection.SendMessage("geterrorhistory");
+            string response = TcpConnection.SendMessage("geterrorhistory");
             if (response == "training stopped" || response == "training finished")
             {
                 timerTrainingPlot.Stop();
@@ -542,25 +518,6 @@ namespace AIDev
             }
         }
 
-        private void TestUpdateTrainingPlot(string trainingErrorPoints)
-        {
-            ViewModels.MainViewModel.Points.Clear();
-            oxyPlotTrainingError.InvalidatePlot(true);
-
-            ViewModels.MainViewModel.Points.Add(new DataPoint(1, .9));
-            ViewModels.MainViewModel.Points.Add(new DataPoint(2, .7));
-            ViewModels.MainViewModel.Points.Add(new DataPoint(3, .6));
-            ViewModels.MainViewModel.Points.Add(new DataPoint(4, .56));
-            ViewModels.MainViewModel.Points.Add(new DataPoint(5, .52));
-            ViewModels.MainViewModel.Points.Add(new DataPoint(6, .45));
-            ViewModels.MainViewModel.Points.Add(new DataPoint(7, .42));
-            ViewModels.MainViewModel.Points.Add(new DataPoint(8, .40));
-            ViewModels.MainViewModel.Points.Add(new DataPoint(9, .39));
-            ViewModels.MainViewModel.Points.Add(new DataPoint(10, .38));
-
-            TogglePlotUpdateIndicator();
-        }
-
         private void UpdateTrainingPlot(string trainingErrorPoints)
         {
             string[] errorPoints;
@@ -572,7 +529,7 @@ namespace AIDev
 
             if (trainingErrorPoints != "" && trainingErrorPoints != "empty")
             {
-                ViewModels.MainViewModel.Points.Clear();
+                ViewModels.TrainingViewModel.Points.Clear();
                 oxyPlotTrainingError.InvalidatePlot(true);
 
                 errorPoints = trainingErrorPoints.Split('|');
@@ -596,7 +553,7 @@ namespace AIDev
                         oxyPlotTrainingError.Axes[1].Maximum = Math.Ceiling(error) + 1;
                     }
 
-                    ViewModels.MainViewModel.Points.Add(new DataPoint(epoch, error));
+                    ViewModels.TrainingViewModel.Points.Add(new DataPoint(epoch, error));
                     epoch++;
                 }
             }
@@ -630,14 +587,8 @@ namespace AIDev
 
         private void ButtonNetReinitialize_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            string command = "";
-
-            command = "reinitialize";
-
-            response = TcpConnection.SendMessage(command);
-
-            MessageBox.Show("Server response: \r\n" + response);
+            string command = "reinitialize";
+            _ = TcpConnection.SendMessage(command);
         }
 
         private void ButtonNetStop_Click(object sender, RoutedEventArgs e)
@@ -648,12 +599,8 @@ namespace AIDev
 
         private void ButtonTrainBump_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            string command = "";
-
-            command = "bump";
-
-            response = TcpConnection.SendMessage(command);
+            string command = "bump";
+            _ = TcpConnection.SendMessage(command);
         }
 
         private void ButtonTrainStop_Click(object sender, RoutedEventArgs e)

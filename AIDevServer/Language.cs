@@ -10,8 +10,8 @@ namespace AIDevServer
     {
         private static string debugOutput;
 
-        private static bool returnParseResults = false;
-        private static bool debugOn = true;  // indicates whether to output debugging info
+        private static readonly bool returnParseResults = false;
+        private static readonly bool debugOn = true;  // indicates whether to output debugging info
 
         private static List<Token> parseTreeTokens;
         private static int numParseTreeTokens;
@@ -48,7 +48,6 @@ namespace AIDevServer
         //  "that it's going to be all right again. I feel much better now. I really do."
         public static string Execute(string statements)
         {
-            string errorMsg = "";
             string response = "";
             string strippedStmts;
 
@@ -58,7 +57,7 @@ namespace AIDevServer
             }
 
             strippedStmts = StripWhiteSpace(statements.ToLower());
-            errorMsg = ParseStmts(strippedStmts);
+            string errorMsg = ParseStmts(strippedStmts);
 
             if (errorMsg == "")
             {
@@ -82,11 +81,11 @@ namespace AIDevServer
 
                 if (semanticResponse == "")
                 {
-                    response = response + "okay;\r\n";
+                    response += "okay;\r\n";
                 }
                 else
                 {
-                    response = response + semanticResponse;
+                    response += semanticResponse;
                 }
             }
             else
@@ -371,7 +370,6 @@ namespace AIDevServer
         {
             string response = "";
             int node = stmtRoot;
-            int stmtChild;
 
             //   <pronounce_stmt>
             //      <pronounce>
@@ -393,7 +391,7 @@ namespace AIDevServer
                 string spokenRec = null;
                 string spokenSynth = null;
 
-                stmtChild = astTokens[node].Children[2];
+                _ = astTokens[node].Children[2];
 
                 // First argument will be either spokenrec or spokensynth.
                 if (astTokens[astTokens[node].Children[2]].Name == "spokenrec")
@@ -678,8 +676,7 @@ namespace AIDevServer
 
         private static string GetQueryResponse(QueryStmt queryStmt)
         {
-            string response = "unknown;";
-            
+            string response;
             switch (queryStmt.Type)
             {
                 case "what":
@@ -697,8 +694,7 @@ namespace AIDevServer
 
         private static string GetImperativeResponse(ImperativeStmt imperStmt)
         {
-            string response = "unknown;";
-
+            string response;
             switch (imperStmt.Type)
             {
                 //case "find":
@@ -731,12 +727,11 @@ namespace AIDevServer
         private static string GetAnswerToWhat(int subjectNode)
         {
             string answer = "";
-            string word = "";
             string stmt;
             List<Token> stmtTokens;
 
             List<string> baseNouns = GetBaseNouns(subjectNode);
-            word = baseNouns[0];
+            string word = baseNouns[0];
 
             List<int> stmtsContainingWord = langKnowledge.FindStmtsContainingWord(word);
 
@@ -903,15 +898,13 @@ namespace AIDevServer
         public static string GetTokenTreeText(List<Token> subTreeTokens, int node)
         {
             string text = "";
-            int child = 0;
-
             if (subTreeTokens[node].Terminal == false)
             {
-                child = 0;
+                int child = 0;
                 while (child < subTreeTokens[node].Children.Count)
                 {
-                    text = text + GetTokenTreeText(subTreeTokens, subTreeTokens[node].Children[child]);
-                    child = child + 1;
+                    text += GetTokenTreeText(subTreeTokens, subTreeTokens[node].Children[child]);
+                    child += 1;
                 }
             }
             else
@@ -934,16 +927,14 @@ namespace AIDevServer
         private static List<int> FindWordInTree(List<Token> treeTokens, int node, string word, 
             List<int> wordNodes)
         {
-            int child = 0;
-
             if (treeTokens[node].Terminal == false)
             {
-                child = 0;
+                int child = 0;
                 while (child < treeTokens[node].Children.Count)
                 {
                     wordNodes = FindWordInTree(
                         treeTokens, treeTokens[node].Children[child], word, wordNodes);
-                    child = child + 1;
+                    child += 1;
                 }
             }
             else
@@ -968,7 +959,6 @@ namespace AIDevServer
 
         private static string ParseStmts(string stmtList)
         {
-            string errorMsg = "";
 
             // Initialize parsing variables
             topTokensLen = 0;
@@ -979,7 +969,7 @@ namespace AIDevServer
             topTokens = new List<int>();
 
             // Parse statement list.
-            errorMsg = Lex(stmtList);
+            string errorMsg = Lex(stmtList);
 
             if (errorMsg == "")
             {
@@ -1008,7 +998,7 @@ namespace AIDevServer
             {
                 if (stmtsStripped[pos] == ' ')
                 {
-                    pos = pos + 1;  // Skip over space character
+                    pos += 1;  // Skip over space character
                 }
 
                 pos = GetToken(pos, ref errorMsg);
@@ -1027,7 +1017,7 @@ namespace AIDevServer
             if (returnParseResults)
             {
                 debugOutput = debugOutput + GetTopTokensOutput(0) + "\r\n";
-                debugOutput = debugOutput + GetLexResults();
+                debugOutput += GetLexResults();
             }
 
             return errorMsg;
@@ -1056,14 +1046,14 @@ namespace AIDevServer
 
                 topTokens.Add(new int());
                 topTokens[numParseTreeTokens] = numParseTreeTokens;
-                numParseTreeTokens = numParseTreeTokens + 1;
+                numParseTreeTokens += 1;
 
                 // Get chars until next quote.
-                pos = pos + 1;
+                pos += 1;
                 while (stmtsStripped[pos] != '\"')
                 {
-                    newToken = newToken + stmtsStripped[pos];
-                    pos = pos + 1;
+                    newToken += stmtsStripped[pos];
+                    pos += 1;
                 }
 
                 // Add string literal token
@@ -1075,8 +1065,7 @@ namespace AIDevServer
 
                 topTokens.Add(new int());
                 topTokens[numParseTreeTokens] = numParseTreeTokens;
-                numParseTreeTokens = numParseTreeTokens + 1;
-                identifiedToken = true;
+                numParseTreeTokens += 1;
 
                 // Add close quote token
                 parseTreeTokens.Add(new Token());
@@ -1087,9 +1076,9 @@ namespace AIDevServer
 
                 topTokens.Add(new int());
                 topTokens[numParseTreeTokens] = numParseTreeTokens;
-                numParseTreeTokens = numParseTreeTokens + 1;
+                numParseTreeTokens += 1;
 
-                pos = pos + 1;
+                pos += 1;
             }
             else    // Not a string literal. Get the token.
             {
@@ -1102,7 +1091,7 @@ namespace AIDevServer
                     // Token is a single-char symbol
                     newToken = stmtsStripped[pos].ToString();
                     gotToken = true;
-                    pos = pos + 1;
+                    pos += 1;
                 }
 
                 while (gotToken == false && pos < stmtsStripped.Length &&
@@ -1111,8 +1100,8 @@ namespace AIDevServer
                     stmtsStripped[pos] != '{' && stmtsStripped[pos] != '}' &&
                     stmtsStripped[pos] != ',')
                 {
-                    newToken = newToken + stmtsStripped[pos];
-                    pos = pos + 1;
+                    newToken += stmtsStripped[pos];
+                    pos += 1;
                 }
 
                 // Identify and add new token.
@@ -1140,7 +1129,7 @@ namespace AIDevServer
 
                                     topTokens.Add(new int());
                                     topTokens[numParseTreeTokens] = numParseTreeTokens;
-                                    numParseTreeTokens = numParseTreeTokens + 1;
+                                    numParseTreeTokens += 1;
                                     identifiedToken = true;
                                 }
                             }
@@ -1194,13 +1183,13 @@ namespace AIDevServer
                                             }
                                         }
                                     }
-                                    numParseTreeTokens = numParseTreeTokens + 1;
+                                    numParseTreeTokens += 1;
                                     identifiedToken = true;
                                 }
                             }
-                            clause = clause + 1;
+                            clause += 1;
                         }
-                        rule = rule + 1;
+                        rule += 1;
                     }
                 }
 
@@ -1225,8 +1214,7 @@ namespace AIDevServer
 
                         topTokens.Add(new int());
                         topTokens[numParseTreeTokens] = numParseTreeTokens;
-                        numParseTreeTokens = numParseTreeTokens + 1;
-                        identifiedToken = true;
+                        numParseTreeTokens += 1;
                         //}
                     }
                     else if (VerifyNumber(newToken) != "")
@@ -1239,15 +1227,14 @@ namespace AIDevServer
 
                         topTokens.Add(new int());
                         topTokens[numParseTreeTokens] = numParseTreeTokens;
-                        numParseTreeTokens = numParseTreeTokens + 1;
-                        identifiedToken = true;
+                        numParseTreeTokens += 1;
                     }
                     else
                     {
                         // GET THIS ERROR MESSAGE TO DISPLAY
                         errorMsg = "[" + newToken + "] is not recognized and is not " +
                                     "a valid identifier.\r\n";
-                        debugOutput = debugOutput + errorMsg;
+                        debugOutput += errorMsg;
                         pos = -1;
                     }
                 }
@@ -1299,7 +1286,7 @@ namespace AIDevServer
                 results = results + "[" + parseTreeTokens[tokenNum].Name.PadLeft(16) +
                     "] [" + parseTreeTokens[tokenNum].Literal + "]\r\n";
 
-                tokenNum = tokenNum + 1;
+                tokenNum += 1;
             }
 
             return results;
@@ -1315,7 +1302,7 @@ namespace AIDevServer
 
             if (debugOn)
             {
-                debugOutput = debugOutput + "\r\nentering ParseTokens\r\n";
+                debugOutput += "\r\nentering ParseTokens\r\n";
             }
 
             maxPhraseSize = LangBnf.LongestPhraseSize;  // currently 8
@@ -1325,7 +1312,7 @@ namespace AIDevServer
             {
                 if (debugOn)
                 {
-                    debugOutput = debugOutput + "beginning of ParseTokens loop\r\n";
+                    debugOutput += "beginning of ParseTokens loop\r\n";
                     debugOutput = debugOutput + GetTopTokensOutput(0) + "\r\n";
                 }
 
@@ -1343,7 +1330,7 @@ namespace AIDevServer
                     }
                     else
                     {
-                        numLoopsNoReduce = numLoopsNoReduce + 1;
+                        numLoopsNoReduce += 1;
                     }
 
                     if (topTokensLen == 1)
@@ -1382,7 +1369,7 @@ namespace AIDevServer
             if (debugOn)
             {
                 debugOutput = debugOutput + "parseDone = " + parseDone + "\r\n";
-                debugOutput = debugOutput + "\r\nexiting ParseTokens\r\n\r\n";
+                debugOutput += "\r\nexiting ParseTokens\r\n\r\n";
             }
 
             return errorMsg;
@@ -1393,12 +1380,6 @@ namespace AIDevServer
         {
             string errorMsg = "";
             bool subParseDone = false;
-            int tokenStringStart = 0;
-            int tokenStringLength = 1;
-            int ruleSearchResult = -1;
-            bool phraseMatched = false;
-            bool allowReduce = true;
-
             if (debugOn)
             {
                 debugOutput = debugOutput + "\r\nentering SubParseTokens, subParseName: \"" +
@@ -1408,40 +1389,37 @@ namespace AIDevServer
             // Loop through tokens, increasing start pos. after each loop.
             if (debugOn)
             {
-                debugOutput = debugOutput + "entering all-tokens loop\r\n";
+                debugOutput += "entering all-tokens loop\r\n";
             }
-            phraseMatched = false;
+
+            bool phraseMatched = false;
             reduceOccurred = false;
-            tokenStringStart = startPos;
-            tokenStringLength = 1;
+            int tokenStringStart = startPos;
             while (errorMsg == "" && subParseDone == false &&
                 phraseMatched == false && tokenStringStart < topTokensLen)
             {
                 // From phrase start, len = 1, increase phrase len by 1 each loop.
                 if (debugOn)
                 {
-                    debugOutput = debugOutput + "entering phrase increase-by-one loop\r\n";
+                    debugOutput += "entering phrase increase-by-one loop\r\n";
                 }
 
                 errorMsg = CheckSyntax(tokenStringStart);
-
-                tokenStringLength = 1;
-                allowReduce = true;
+                int tokenStringLength = 1;
                 while (errorMsg == "" && subParseDone == false &&
                     reduceOccurred == false && tokenStringLength <= maxPhraseSize &&
                     tokenStringStart + (tokenStringLength - 1) <= topTokensLen - 1)
                 {
                     if (debugOn)
                     {
-                        debugOutput = debugOutput + "entering phrase-match loop\r\n";
+                        debugOutput += "entering phrase-match loop\r\n";
                     }
                     phraseMatched = false;
-                    allowReduce = true;
                     if (debugOn)
                     {
-                        debugOutput = debugOutput + "\r\n";
-                        debugOutput = debugOutput + GetTopTokensOutput(0);
-                        debugOutput = debugOutput + GetPhraseInfoOutput(subParseName, tokenStringStart, tokenStringLength);
+                        debugOutput += "\r\n";
+                        debugOutput += GetTopTokensOutput(0);
+                        debugOutput += GetPhraseInfoOutput(subParseName, tokenStringStart, tokenStringLength);
                     }
 
                     //// Perform a sub-parse starting with last token in phrase if needed.
@@ -1464,11 +1442,11 @@ namespace AIDevServer
                     //}
 
                     List<int> rulesFound = new List<int>();
-                    ruleSearchResult = FindRule(tokenStringStart, tokenStringLength, rulesFound);
+                    int ruleSearchResult = FindRule(tokenStringStart, tokenStringLength, rulesFound);
                     if (ruleSearchResult != -1)
                     {
                         phraseMatched = true;
-
+                        bool allowReduce;
                         if (rulesFound.Count > 1)
                         {
                             // Two possible rules found.
@@ -1519,7 +1497,7 @@ namespace AIDevServer
                         if (allowReduce == false)
                         {
                             // Match found, but allowReduce was false.
-                            tokenStringLength = tokenStringLength + 1;  // add next token to phrase
+                            tokenStringLength += 1;  // add next token to phrase
                         }
 
                         //// If sub-parse reduction was completed, sub-parse is done.
@@ -1539,16 +1517,16 @@ namespace AIDevServer
                     }
                     else  // match not found
                     {
-                        tokenStringLength = tokenStringLength + 1;  // add next token to phrase
+                        tokenStringLength += 1;  // add next token to phrase
                     }
                 }
-                tokenStringStart = tokenStringStart + 1;  // shift beginning of phrase forward
+                tokenStringStart += 1;  // shift beginning of phrase forward
             }
 
             if (debugOn)
             {
                 debugOutput = debugOutput + "subParseDone = " + subParseDone + "\r\n";
-                debugOutput = debugOutput + "\r\nexiting SubParseTokens\r\n\r\n";
+                debugOutput += "\r\nexiting SubParseTokens\r\n\r\n";
             }
 
             return errorMsg;
@@ -1559,10 +1537,7 @@ namespace AIDevServer
                                             int startPos, string subParseName)
         {
             string subParseNeeded = "";
-            string name = "";
-
-            name = parseTreeTokens[topTokens[tokenStringStart + (tokenStringLength - 1)]].Name;
-
+            string name = parseTreeTokens[topTokens[tokenStringStart + (tokenStringLength - 1)]].Name;
             if ((name == "of" || name == "which") && 
                 tokenStringStart + (tokenStringLength - 1) > startPos)
             {
@@ -2010,11 +1985,11 @@ namespace AIDevServer
 
                 if (allowReduce == true)
                 {
-                    debugOutput = debugOutput + "allow reduce = true.\r\n";
+                    debugOutput += "allow reduce = true.\r\n";
                 }
                 else
                 {
-                    debugOutput = debugOutput + "allow reduce = false.\r\n";
+                    debugOutput += "allow reduce = false.\r\n";
                 }
             }
 
@@ -2097,7 +2072,7 @@ namespace AIDevServer
                 {
                     // Add new token to parse tree
                     parseTreeTokens.Add(new Token());
-                    numParseTreeTokens = numParseTreeTokens + 1;
+                    numParseTreeTokens += 1;
                     parent = numParseTreeTokens - 1;
                     parseTreeTokens[parent].Name = ruleName;
                     parseTreeTokens[parent].Terminal = false;
@@ -2109,7 +2084,7 @@ namespace AIDevServer
             {
                 // Add new token to parse tree
                 parseTreeTokens.Add(new Token());
-                numParseTreeTokens = numParseTreeTokens + 1;
+                numParseTreeTokens += 1;
                 parent = numParseTreeTokens - 1;
                 parseTreeTokens[parent].Name = ruleName;
                 parseTreeTokens[parent].Terminal = false;
@@ -2126,7 +2101,7 @@ namespace AIDevServer
                 // Link token below to new token
                 parseTreeTokens[topTokens[pos]].Parent = parent;
 
-                pos = pos + 1;
+                pos += 1;
             }
             topTokens[startPos] = parent;
 
@@ -2150,10 +2125,10 @@ namespace AIDevServer
             while (tokensRemoved < numTokensToRemove)
             {
                 topTokens.RemoveAt(shiftStartPos - numTokensToRemove);
-                tokensRemoved = tokensRemoved + 1;
+                tokensRemoved += 1;
             }
 
-            topTokensLen = topTokensLen - tokensRemoved;
+            topTokensLen -= tokensRemoved;
             //topTokensLen = topTokens.Count;
         }
 
@@ -2161,8 +2136,6 @@ namespace AIDevServer
         {
             int clauseNum;
             int ruleNumFound = -1;
-            bool ruleFound = false;
-
             int ruleNum = 0;
             //while ((ruleFound == false) && (ruleNum < LangBNF.LangRules.Count))
 
@@ -2177,15 +2150,15 @@ namespace AIDevServer
                 //while ((ruleFound == false) && (clauseNum < LangBNF.LangRules[ruleNum].Clauses.Count))
                 while (clauseNum < LangBnf.LangRules[ruleNum].Clauses.Count)
                 {
-                    ruleFound = MatchTokenClause(ruleNum, clauseNum, startPos, tokenStringLength);
+                    bool ruleFound = MatchTokenClause(ruleNum, clauseNum, startPos, tokenStringLength);
                     if (ruleFound == true)
                     {
                         ruleNumFound = ruleNum;
                         rulesFound.Add(ruleNum);
                     }
-                    clauseNum = clauseNum + 1;
+                    clauseNum += 1;
                 }
-                ruleNum = ruleNum + 1;
+                ruleNum += 1;
             }
 
             //if (ruleToken == "predicate")
@@ -2216,7 +2189,7 @@ namespace AIDevServer
                     {
                         matched = false;
                     }
-                    tokenNum = tokenNum + 1;
+                    tokenNum += 1;
                 }
             }
             else
@@ -2231,7 +2204,7 @@ namespace AIDevServer
                         {
                             matched = false;
                         }
-                        tokenNum = tokenNum + 1;
+                        tokenNum += 1;
                     }
                 }
                 else
@@ -2376,7 +2349,7 @@ namespace AIDevServer
                 while (child < astTokens[node].Children.Count && startNewAstPass == false)
                 {
                     ConvertNodeToAst(astTokens[node].Children[child], child);
-                    child = child + 1;
+                    child += 1;
                 }
             }
             //if (convertChildren)
@@ -2514,14 +2487,13 @@ namespace AIDevServer
         // Creates a deep clone of a list of tokens by serializing it, and returns the copy.
         private static List<Token> CloneTokenList(List<Token> tokens)
         {
-            object objectClone = null;
             List<Token> tokensListClone = null;
             using (MemoryStream memoryStream = new MemoryStream())
             {
                 BinaryFormatter binaryFormatter = new BinaryFormatter();
                 binaryFormatter.Serialize(memoryStream, tokens);
                 memoryStream.Position = 0;
-                objectClone = binaryFormatter.Deserialize(memoryStream);
+                object objectClone = binaryFormatter.Deserialize(memoryStream);
                 tokensListClone = (List<Token>)objectClone;
             }
 
@@ -2533,7 +2505,6 @@ namespace AIDevServer
         private static int CopyTokenSubTree(List<Token> treeTokens, List<Token> newTreeTokens, 
             int node, int newParent = -1)
         {
-            int child = 0;
             Token newToken = new Token();
             newTreeTokens.Add(newToken);
 
@@ -2555,12 +2526,12 @@ namespace AIDevServer
 
             if (treeTokens[node].Terminal == false)
             {
-                child = 0;
+                int child = 0;
                 while (child < treeTokens[node].Children.Count)
                 {
                     newChild = CopyTokenSubTree(treeTokens, newTreeTokens, treeTokens[node].Children[child], newNode);
                     newTreeTokens[newNode].Children.Add(newChild);
-                    child = child + 1;
+                    child += 1;
                 }
             }
 
@@ -2569,18 +2540,18 @@ namespace AIDevServer
 
         private static string GetParseTreeDescription(bool ast = false)
         {
-            string parseTreeOutput = "";
             int indentLevel = 0;
 
+            string parseTreeOutput;
             if (ast)
             {
                 parseTreeOutput = "Abstract Syntax Tree:" + "\r\n" + "-----------\r\n";
-                parseTreeOutput = parseTreeOutput + GetSubTreeDescription(astTokens, astRoot, indentLevel);
+                parseTreeOutput += GetSubTreeDescription(astTokens, astRoot, indentLevel);
             }
             else
             {
                 parseTreeOutput = "Parse Tree:" + "\r\n" + "-----------\r\n";
-                parseTreeOutput = parseTreeOutput + GetSubTreeDescription(parseTreeTokens, parseTreeRoot, indentLevel);
+                parseTreeOutput += GetSubTreeDescription(parseTreeTokens, parseTreeRoot, indentLevel);
             }
 
             return parseTreeOutput;
@@ -2589,25 +2560,24 @@ namespace AIDevServer
         private static string GetSubTreeDescription(List<Token> subTreeTokens, int node, int indentLevel)
         {
             string subTreeDescription = "";
-            int child = 0;
             int tabCount = 0;
 
             while (tabCount < indentLevel)
             {
-                subTreeDescription = subTreeDescription + "   ";
-                tabCount = tabCount + 1;
+                subTreeDescription += "   ";
+                tabCount += 1;
             }
             subTreeDescription = subTreeDescription + "<" + subTreeTokens[node].Name + ">\r\n";
 
             if (subTreeTokens[node].Terminal == false)
             {
-                indentLevel = indentLevel + 1;
-                child = 0;
+                indentLevel += 1;
+                int child = 0;
                 while (child < subTreeTokens[node].Children.Count)
                 {
-                    subTreeDescription = subTreeDescription + GetSubTreeDescription(
+                    subTreeDescription += GetSubTreeDescription(
                         subTreeTokens, subTreeTokens[node].Children[child], indentLevel);
-                    child = child + 1;
+                    child += 1;
                 }
             }
             else
@@ -2615,8 +2585,8 @@ namespace AIDevServer
                 tabCount = 0;
                 while (tabCount <= indentLevel)
                 {
-                    subTreeDescription = subTreeDescription + "   ";
-                    tabCount = tabCount + 1;
+                    subTreeDescription += "   ";
+                    tabCount += 1;
                 }
                 subTreeDescription = subTreeDescription + "\"" + subTreeTokens[node].Literal + "\"\r\n";
             }
@@ -2633,9 +2603,9 @@ namespace AIDevServer
             while (pos < topTokensLen)
             {
                 topTokensString = topTokensString + "[" + parseTreeTokens[topTokens[pos]].Name + "]";
-                pos = pos + 1;
+                pos += 1;
             }
-            topTokensString = topTokensString + "\r\n";
+            topTokensString += "\r\n";
 
             return topTokensString;
         }
@@ -2648,9 +2618,9 @@ namespace AIDevServer
             phraseInfo = phraseInfo + "subParseName: \"" + subParseName + "\"\r\n";
             phraseInfo = phraseInfo + "tokenString start: " + tokenStringStart +
                 ", length: " + tokenStringLength + "\r\n";
-            phraseInfo = phraseInfo + "tokenString: ";
-            phraseInfo = phraseInfo + GetPhraseOutput(tokenStringStart, tokenStringLength);
-            phraseInfo = phraseInfo + "\r\n";
+            phraseInfo += "tokenString: ";
+            phraseInfo += GetPhraseOutput(tokenStringStart, tokenStringLength);
+            phraseInfo += "\r\n";
 
             return phraseInfo;
         }
@@ -2664,7 +2634,7 @@ namespace AIDevServer
             while (pos < (startPos + tokenStringLength) && (topTokens.Count > pos))
             {
                 phrase = phrase + "[" + parseTreeTokens[topTokens[pos]].Name + "]";
-                pos = pos + 1;
+                pos += 1;
             }
 
             return phrase;
@@ -2693,7 +2663,7 @@ namespace AIDevServer
                         {
                             isIdentifier = false;
                         }
-                        pos = pos + 1;
+                        pos += 1;
                     }
                 }
             }
@@ -2703,7 +2673,6 @@ namespace AIDevServer
         static string VerifyNumber(string newToken)
         {
             int pos;  // position in token string
-            bool isNumber = false;
             string numberType = "";
 
             if (newToken.Length <= 11)  // maximum digits is 11 (-9999999999)
@@ -2711,7 +2680,7 @@ namespace AIDevServer
                 // Token is within size limit for numbers
                 if (newToken != "" && VerifyNumeric(newToken[0]) == true)
                 {
-                    isNumber = true;
+                    bool isNumber = true;
                     pos = 1;
                     while (isNumber == true && pos < newToken.Length)
                     {
@@ -2719,7 +2688,7 @@ namespace AIDevServer
                         {
                             isNumber = false;
                         }
-                        pos = pos + 1;
+                        pos += 1;
                     }
                 }
 
@@ -2801,7 +2770,7 @@ namespace AIDevServer
                     {
                         if (whiteSpaceAdded == false)
                         {
-                            strStripped = strStripped + " ";
+                            strStripped += " ";
                             whiteSpaceAdded = true;
                         }
                     }
@@ -2824,15 +2793,15 @@ namespace AIDevServer
                     }
                     else
                     {
-                        strStripped = strStripped + str[pos];
+                        strStripped += str[pos];
                         whiteSpaceAdded = false;
                     }
                 }
                 else
                 {
-                    strStripped = strStripped + str[pos];
+                    strStripped += str[pos];
                 }
-                pos = pos + 1;
+                pos += 1;
             }
 
             return strStripped.Trim();
@@ -2882,7 +2851,7 @@ namespace AIDevServer
                                 case "disc_obj_noun":
                                 case "non_disc_obj_noun":
                                 case "adj":
-                                    udWords = udWords + "||||||||";
+                                    udWords += "||||||||";
                                     break;
                                 case "class_noun":
                                     udWords = udWords +
@@ -2904,7 +2873,7 @@ namespace AIDevServer
                                 default:
                                     break;
                             }
-                            udWords = udWords + Environment.NewLine;
+                            udWords += Environment.NewLine;
                         }
                     }
                 }
@@ -2931,38 +2900,36 @@ namespace AIDevServer
                     "verb_past, verb_past_spoken_rec, verb_past_spoken_synth " +
                 "FROM ud_word ORDER BY type, base", KBConnection);
 
-                using (SqlDataReader reader = sql.ExecuteReader())
+                using SqlDataReader reader = sql.ExecuteReader();
+                while (reader.Read())
                 {
-                    while (reader.Read())
-                    {
-                        bnfType = LangBnf.GetBnfType(reader[0].ToString());
-                        rule = LangBnf.LexRules.FindIndex(
-                            lexRule => lexRule.Token == bnfType);
-                        LangBnf.LexRules[rule].Clauses.Add(new LangBnf.LexClause(true, false));
-                        clause = LangBnf.LexRules[rule].Clauses.Count - 1;
-                        LangBnf.LexRules[rule].Clauses[clause].Items.Add(
-                            new LangBnf.LexItem(reader[1].ToString(), reader[2].ToString(),
-                            reader[3].ToString()));
+                    bnfType = LangBnf.GetBnfType(reader[0].ToString());
+                    rule = LangBnf.LexRules.FindIndex(
+                        lexRule => lexRule.Token == bnfType);
+                    LangBnf.LexRules[rule].Clauses.Add(new LangBnf.LexClause(true, false));
+                    clause = LangBnf.LexRules[rule].Clauses.Count - 1;
+                    LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                        new LangBnf.LexItem(reader[1].ToString(), reader[2].ToString(),
+                        reader[3].ToString()));
 
-                        switch (bnfType)
-                        {
-                            case "class_noun":
-                                LangBnf.LexRules[rule].Clauses[clause].Items.Add(
-                                    new LangBnf.LexItem(reader[4].ToString(), reader[5].ToString(),
-                                    reader[6].ToString()));
-                                break;
-                            case "intrans_verb":
-                            case "trans_verb":
-                                LangBnf.LexRules[rule].Clauses[clause].Items.Add(
-                                    new LangBnf.LexItem(reader[7].ToString(), reader[8].ToString(),
-                                    reader[9].ToString()));
-                                LangBnf.LexRules[rule].Clauses[clause].Items.Add(
-                                    new LangBnf.LexItem(reader[10].ToString(), reader[11].ToString(),
-                                    reader[12].ToString()));
-                                break;
-                            default:
-                                break;
-                        }
+                    switch (bnfType)
+                    {
+                        case "class_noun":
+                            LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                                new LangBnf.LexItem(reader[4].ToString(), reader[5].ToString(),
+                                reader[6].ToString()));
+                            break;
+                        case "intrans_verb":
+                        case "trans_verb":
+                            LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                                new LangBnf.LexItem(reader[7].ToString(), reader[8].ToString(),
+                                reader[9].ToString()));
+                            LangBnf.LexRules[rule].Clauses[clause].Items.Add(
+                                new LangBnf.LexItem(reader[10].ToString(), reader[11].ToString(),
+                                reader[12].ToString()));
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -2995,7 +2962,7 @@ namespace AIDevServer
                 {
                     if (simpleVersion)
                     {
-                        languageDefinition = languageDefinition + "\t[Clause]\r\n";
+                        languageDefinition += "\t[Clause]\r\n";
                     }
                     else
                     {
@@ -3019,7 +2986,7 @@ namespace AIDevServer
                 }
             }
 
-            languageDefinition = languageDefinition + "\r\nLexical Rules:\r\n\r\n";
+            languageDefinition += "\r\nLexical Rules:\r\n\r\n";
             for (int rule = 0; rule < LangBnf.LexRules.Count; rule++)
             {
                 if (simpleVersion)
@@ -3037,7 +3004,7 @@ namespace AIDevServer
                 {
                     if (simpleVersion)
                     {
-                        languageDefinition = languageDefinition + "\t";
+                        languageDefinition += "\t";
                     }
                     else
                     {
@@ -3045,8 +3012,7 @@ namespace AIDevServer
                             "\tClause [" + clause.ToString().PadLeft(2) + "] \r\n";
                     }
 
-                    languageDefinition = languageDefinition + 
-                        LangBnf.LexRules[rule].Clauses[clause].Items[0].Word;
+                    languageDefinition +=                         LangBnf.LexRules[rule].Clauses[clause].Items[0].Word;
 
                     for (int item = 1; item < LangBnf.LexRules[rule].Clauses[clause].Items.Count; 
                         item++)
@@ -3189,7 +3155,7 @@ namespace AIDevServer
                 while (child < stmt.StmtTokens[node].Children.Count)
                 {
                     FindKeywordLocations(stmt, stmt.StmtTokens[node].Children[child]);
-                    child = child + 1;
+                    child += 1;
                 }
             }
             else

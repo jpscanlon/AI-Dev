@@ -14,7 +14,7 @@
     <!--WindowStartupLocation="CenterScreen" Background="{DynamicResource 
         {x:Static SystemColors.MenuBarBrushKey}}" Top="0" Left="0">-->
     <Window.DataContext>
-        <local:MainViewModel/>
+        <local:TrainingViewModel/>
     </Window.DataContext>
     <DockPanel x:Name="dockPanelMain" LastChildFill="True" RenderTransformOrigin="-2.95,-1.3" 
                Background="#FFF0F0F0">
@@ -30,30 +30,30 @@
                 <MenuItem x:Name="menuItemFileOpenKB" Header="Open Knowledgebase" 
                           Click="MenuItemFileOpenKB_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Knowledgebase.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Knowledgebase.png"/>
                     </MenuItem.Icon>
                     <!--<MenuItem.Icon> <Image Source="C:\Windows\VS2017 Image Library\VS2017\DatabaseUnitTest\DatabaseUnitTest_16x.png"/> </MenuItem.Icon>-->
                 </MenuItem>
                 <MenuItem x:Name="menuItemFileOpen" Header="Open File">
                     <MenuItem.Icon>
-                        <Image Source="C:\Windows\VS2017 Image Library\VS2017\OpenFolder\OpenFolder_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\OpenFolder_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem x:Name="menuItemFileClose" Header="Close"/>
                 <MenuItem x:Name="menuItemFileCloseKB" Header="Close Knowledgebase">
                     <MenuItem.Icon>
-                        <Image Source="C:\Windows\VS2017 Image Library\VS2017\Close\Close_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem x:Name="menuItemFileSave" Header="Save" InputGestureText="Ctrl+S">
                     <MenuItem.Icon>
-                        <Image Source="C:\Windows\VS2017 Image Library\VS2017\Save\Save_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Save_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
                 <MenuItem x:Name="menuItemFileExit" Header="Exit" InputGestureText="Alt+F4">
                     <MenuItem.Icon>
-                        <Image Source="C:\Windows\VS2017 Image Library\VS2017\Close\Close_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -61,24 +61,24 @@
                 <!--<MenuItem x:Name="menuItemView" Header="View" Style="{DynamicResource SimpleMenuItem}">-->
                 <MenuItem x:Name="menuItemViewKBExplorer" Header="Knowledgebase Explorer" InputGestureText="Ctrl+Alt+K">
                     <MenuItem.Icon>
-                        <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Knowledgebase.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Knowledgebase.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator HorizontalAlignment="Left" Width="215.053"/>
                 <MenuItem x:Name="menuItemViewCommands" Header="Commands" InputGestureText="Ctrl+Alt+C" Click="MenuItemViewCommands_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Windows\VS2017 Image Library\VS2017\TextImage\TextImage_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Console_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem x:Name="menuItemViewVocab" Header="Vocabulary" InputGestureText="Ctrl+Alt+V" Click="MenuItemViewVocab_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Windows\VS2017 Image Library\VS2017\Dictionary\Dictionary_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Dictionary_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator HorizontalAlignment="Left" Width="215.053"/>
                 <MenuItem x:Name="menuItemViewNets" Header="Neural Nets" InputGestureText="Ctrl+Alt+N" Click="MenuItemViewNets_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\NeuralNetwork_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\NeuralNetwork_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
             </MenuItem>
@@ -91,38 +91,38 @@
                 <Separator/>
                 <MenuItem x:Name="menuItemTestTcpConnect" Header="TCP Connect" Click="MenuItemTestTcpConnect_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Windows\VS2017 Image Library\VS2017\ConnectToRemoteServer\ConnectToRemoteServer_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\ConnectToRemoteServer_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem x:Name="menuItemTestTcpDisconnect" Header="TCP Disconnect" Click="MenuItemTestTcpDisconnect_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Windows\VS2017 Image Library\VS2017\Disconnect\Disconnect_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Disconnect_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem x:Name="menuItemTestTcpMessage" Header="TCP Message" Click="MenuItemTestTcpMessage_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Windows\VS2017 Image Library\VS2017\ServerRunTest\ServerRunTest_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\ServerRunTest_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
                 <MenuItem x:Name="menuWriteToLog" Header="Write To Log" Click="MenuItemWriteToLog_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\WriteToHistory_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\WriteToHistory_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem x:Name="menuClearLog" Header="Clear Log" Click="MenuClearLog_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Eraser_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Eraser_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem x:Name="menuItemTestCode" Header="Run Code" Click="MenuItemTestCode_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\CodeTest_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\CodeTest_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <MenuItem x:Name="menuItemTestSQLStatement" Header="Run SQL" Click="MenuItemTestSQLStatement_Click">
                     <MenuItem.Icon>
-                        <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\SQL_16x.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\SQL_16x.png"/>
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator/>
@@ -130,7 +130,7 @@
             <MenuItem x:Name="menuItemSettings" Header="Settings">
                 <MenuItem x:Name="menuItemSettingsVoices" Header="Voices" InputGestureText="">
                     <!--<MenuItem.Icon>
-                        <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Knowledgebase.png"/>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Knowledgebase.png"/>
                     </MenuItem.Icon>-->
                     <MenuItem x:Name="menuItemSettingsVoicesDavid" Header="Microsoft David Desktop - US" Tag="David"
                             Click="menuItemSettingsVoices_Click">
@@ -153,13 +153,13 @@
         <ToolBarTray x:Name="toolBarTrayMain" Height="22" VerticalAlignment="Top" DockPanel.Dock="Top" Background="#FFF0F0F0">
             <ToolBar x:Name="toolBarMain" VerticalAlignment="Top" Margin="4,0,-22,0" IsHitTestVisible="True" BorderBrush="White" HorizontalAlignment="Left" Width="86" Background="#FFF0F0F0">
                 <Button x:Name="buttonOpenKB" VerticalAlignment="Top" Width="20" MinWidth="20" MinHeight="20" Margin="0,0,0,-5" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" ToolTip="Open Knowledgebase (Ctrl+Shift+O)" Height="20">
-                    <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Knowledgebase.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
+                    <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Knowledgebase.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
                 </Button>
                 <Button x:Name="buttonOpenFile" VerticalAlignment="Top" Width="20" MinWidth="20" MinHeight="20" Margin="0,0,0,-5" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" ToolTip="Open File (Ctrl+O)" Height="20">
-                    <Image Source="C:\Windows\VS2017 Image Library\VS2017\OpenFolder\OpenFolder_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
+                    <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\OpenFolder_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
                 </Button>
                 <Button x:Name="buttonSave" VerticalAlignment="Top" Width="20" MinWidth="20" MinHeight="20" Margin="0,0,0,-5" HorizontalAlignment="Left" HorizontalContentAlignment="Left" VerticalContentAlignment="Top" ToolTip="Save (Ctrl+S)" Height="20">
-                    <Image Source="C:\Windows\VS2017 Image Library\VS2017\Save\Save_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
+                    <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Save_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
                 </Button>
             </ToolBar>
         </ToolBarTray>
@@ -169,7 +169,7 @@
                     <Grid x:Name="gridImageExplorerTitle" Height="24" VerticalAlignment="Top" DockPanel.Dock="Top" Margin="0" Background="{DynamicResource NormalBrush}">
                         <Label x:Name="labelImageExplorer" Content="Image Explorer" Height="24" FontSize="11" Margin="0,0,24,0"/>
                         <Button x:Name="buttonImageExplorerClose" Margin="0" HorizontalAlignment="Right" Width="24" Background="{x:Null}" BorderBrush="{x:Null}">
-                            <Image Source="C:\Windows\VS2017 Image Library\VS2017\Close\Close_8x_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
+                            <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_8x_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
                         </Button>
                     </Grid>
                     <TreeView x:Name="treeViewImageExplorer" DockPanel.Dock="Top" Background="#FFF0F0F0" Height="573" BorderBrush="{x:Null}">
@@ -193,7 +193,7 @@
                     <Grid x:Name="gridKBExplorerTitle" Height="24" VerticalAlignment="Top" DockPanel.Dock="Top" Margin="0" Background="{DynamicResource NormalBrush}">
                         <Label x:Name="labelKBExporer" Content="KB Explorer" Height="24" FontSize="11" Margin="0,0,24,0"/>
                         <Button x:Name="buttonKBExplorerClose" Margin="0" HorizontalAlignment="Right" Width="24" Background="{x:Null}" BorderBrush="{x:Null}">
-                            <Image Source="C:\Windows\VS2017 Image Library\VS2017\Close\Close_8x_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
+                            <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_8x_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
                         </Button>
                     </Grid>
                     <TreeView x:Name="treeViewKBExplorer" Background="#FFF0F0F0" BorderBrush="{x:Null}" DockPanel.Dock="Top" RenderTransformOrigin="0.406,0.497" Height="256" HorizontalAlignment="Right" Width="138">
@@ -214,7 +214,7 @@
                     <Grid x:Name="gridPropertiesTitle" Height="24" VerticalAlignment="Top" DockPanel.Dock="Top" Margin="0" Background="{DynamicResource NormalBrush}">
                         <Label x:Name="labelProperties" Content="Properties" Height="24" FontSize="11" Margin="0,0,24,0"/>
                         <Button x:Name="buttonPropertiesClose" Margin="0" HorizontalAlignment="Right" Width="24" Background="{x:Null}" BorderBrush="{x:Null}">
-                            <Image Source="C:\Windows\VS2017 Image Library\VS2017\Close\Close_8x_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
+                            <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_8x_16x.png" Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Center" VerticalAlignment="Center" Height="16" />
                         </Button>
                     </Grid>
                     <TreeView x:Name="treeViewProperties" Margin="0" Background="#FFF0F0F0" DockPanel.Dock="Top" Height="284" BorderBrush="{x:Null}">
@@ -254,7 +254,7 @@
                         <Button x:Name="buttonTabCommandsClose" VerticalAlignment="Top" Width="20" MinWidth="20" MinHeight="20" Margin="0" 
                                 HorizontalAlignment="Right" HorizontalContentAlignment="Right" VerticalContentAlignment="Top" Height="20" 
                                 BorderThickness="0" Background="{x:Null}" BorderBrush="{x:Null}" Click="ButtonTabCommandsClose_Click">
-                            <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
+                            <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
                                    Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Right" VerticalAlignment="Center" Height="16"/>
                         </Button>
                     </StackPanel>
@@ -268,8 +268,8 @@
                     <Border x:Name="borderInputImage1" BorderBrush="#FFB4B4B4" BorderThickness="0,0,0,1" Background="#FFF0F0F0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden" VerticalAlignment="Top" Height="195" Grid.ColumnSpan="2" Margin="556,0,0,0">
                         <Image x:Name="imageInputImage1" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                             <Image.Source>
-                                <BitmapImage UriSource="C:\Users\Admin\OneDrive\Data\Images\Interesting\Psychedelic Explosion.jpg"/>
-                                <!--<BitmapImage UriSource="C:/Users/Admin/OneDrive/Data/Images/Astronomy/Best/m87-core.jpg"/>-->
+                                <BitmapImage UriSource="C:\Users\User2\Dev\AI Dev\AIDev Resources\Images\Psychedelic Explosion.jpg"/>
+                                <!--<BitmapImage UriSource="C:\Users\User2\Dev\AI Dev\AIDev Resources\Images/m87-core.jpg"/>-->
                             </Image.Source>
                         </Image>
                     </Border>
@@ -286,7 +286,7 @@
                         <Button x:Name="buttonTabVocabClose" VerticalAlignment="Top" Width="20" MinWidth="20" MinHeight="20" Margin="0" 
                                 HorizontalAlignment="Right" HorizontalContentAlignment="Right" VerticalContentAlignment="Top" Height="20" 
                                 BorderThickness="0" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Hidden" Click="ButtonTabVocabClose_Click">
-                            <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
+                            <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
                                    Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Right" VerticalAlignment="Center" Height="16"/>
                         </Button>
                     </StackPanel>
@@ -312,7 +312,7 @@
                         <Button x:Name="buttonTabNetsClose" VerticalAlignment="Top" Width="20" MinWidth="20" MinHeight="20" Margin="0" 
                                 HorizontalAlignment="Right" HorizontalContentAlignment="Right" VerticalContentAlignment="Top" Height="20" 
                                 BorderThickness="0" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Hidden" GotFocus="ButtonTabNetsClose_GotFocus" Click="ButtonTabNetsClose_Click">
-                            <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
+                            <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
                                    Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Right" VerticalAlignment="Center" Height="16"/>
                         </Button>
                     </StackPanel>
@@ -350,7 +350,7 @@
                         <Button x:Name="buttonTabNetClose" VerticalAlignment="Top" Width="20" MinWidth="20" MinHeight="20" Margin="0" 
                                 HorizontalAlignment="Right" HorizontalContentAlignment="Right" VerticalContentAlignment="Top" Height="20" 
                                 BorderThickness="0" Background="{x:Null}" BorderBrush="{x:Null}" Visibility="Hidden" Click="ButtonTabNetClose_Click">
-                            <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
+                            <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
                                    Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Right" VerticalAlignment="Center" Height="16"/>
                         </Button>
                     </StackPanel>
@@ -398,7 +398,7 @@
                     <Border x:Name="borderNetInputImage1" BorderBrush="#FFB4B4B4" BorderThickness="1" Background="#FFF0F0F0" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden" VerticalAlignment="Top" Height="276" Margin="0,10,10,0" Grid.Column="3">
                         <Image x:Name="imageNetInputImage1" ScrollViewer.HorizontalScrollBarVisibility="Auto" Margin="0">
                             <Image.Source>
-                                <BitmapImage UriSource="C:\Users\Admin\Data\AI Dev Visual Inputs\Datasets\EMINST\mnist_png\testing\0\3.png"/>
+                                <BitmapImage UriSource="C:\Users\User2\Dev\AI Dev Visual Inputs\Datasets\EMNIST\mnist_png\testing\0\3.png"/>
                             </Image.Source>
                         </Image>
                     </Border>
@@ -425,12 +425,12 @@
                 <TabItem.Header>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Padding="0,0,4,0" TextAlignment="Left"><Run Text="Training"/></TextBlock>
-                        <!--<Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
+                        <!--<Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
                                HorizontalAlignment="Right"/>-->
                         <Button x:Name="buttonTabTrainClose" VerticalAlignment="Top" Width="20" MinWidth="20" MinHeight="20" Margin="0" 
                                 HorizontalAlignment="Right" HorizontalContentAlignment="Right" VerticalContentAlignment="Top" Height="20" 
                                 BorderThickness="0" Background="{x:Null}" BorderBrush="{x:Null}" Click="ButtonTabTrainClose_Click">
-                            <Image Source="C:\Users\Admin\Data\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
+                            <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Close_NoHalo_12x_16x - Custom - Black.png"
                                    Margin="0" MinWidth="16" MinHeight="16" Width="16" HorizontalAlignment="Right" VerticalAlignment="Center" Height="16"/>
                         </Button>
                     </StackPanel>

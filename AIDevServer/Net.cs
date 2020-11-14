@@ -25,11 +25,11 @@ namespace AIDevServer
 
         // These declarations have the dots under them, suggesting make readonly, because they currently
         // aren't being modified.
-        private int poolingStepSize = 2;  // 2 reduces map dimensions by 1/2.
-        private int filterSize = 3;
+        private readonly int poolingStepSize = 2;  // 2 reduces map dimensions by 1/2.
+        private readonly int filterSize = 3;
         // Set to default number of filters for 1st conv layer.
         // 2nd layer gets 2 * numFilters, 3rd layer gets 3 * numFilters, etc.
-        private int numFilters = 6;
+        private readonly int numFilters = 6;
         //private float numFiltersIncreaseFactor = 2;
         const float biasInput = 1.0F;
 
@@ -56,8 +56,6 @@ namespace AIDevServer
         public string Create(int netID, string name, NetType type, string activationFunction,
             int numInputs, int numOutputs, int numFCLayers, int numConvLayers, bool grayscale = false)
         {
-            string result = "error";
-
             NetID = netID;
             Name = name;
             Type = type;
@@ -67,8 +65,7 @@ namespace AIDevServer
             NumOutputs = numOutputs;
             IsGrayscale = grayscale;
             int numInputMaps;
-
-            Random random = new Random();
+            _ = new Random();
 
             //GetNetProperties(netID);
 
@@ -164,8 +161,7 @@ namespace AIDevServer
 
             //CreateSavedWeightsArrays();
 
-            result = "success";
-
+            string result = "success";
             return result;
         }
 
@@ -178,7 +174,7 @@ namespace AIDevServer
             if (Type == NetType.Convolutional)
             {
                 // Initialize weights in conv layers.
-                int numWeightsInFilter = filterSize * filterSize;
+                _ = filterSize * filterSize;
 
                 for (int layer = 0; layer < NumConvLayers; layer++)
                 {
@@ -239,7 +235,7 @@ namespace AIDevServer
         }
 
         // Returns a random double with a Gaussian distribution.
-        // "Gauss" rhymes with "house".
+        // ("Gauss" rhymes with "house".)
         private static double NextGaussianDouble(Random random)
         {
             double u, v, S;
@@ -262,7 +258,7 @@ namespace AIDevServer
             //weightValue = (weightValue / Convert.ToSingle(numInputs)); // * 2;
 
             // This seems to work to some degree.
-            weightValue = weightValue / Math.Sqrt(Convert.ToDouble(numInputs));
+            weightValue /= Math.Sqrt(Convert.ToDouble(numInputs));
 
             // Testing.
             //weightValue = weightValue / 4;
@@ -431,8 +427,6 @@ namespace AIDevServer
 
         public void OutputWeights()
         {
-            float weightValue;
-
             if (Type == NetType.Convolutional)
             {
                 // Conv weights.
@@ -447,13 +441,13 @@ namespace AIDevServer
                                 for (int y = 0; y < filterSize; y++)
                                 {
                                     // Filter input weight.
-                                    weightValue = convLayers[layer].Weights[iFilter, inputMap, x, y];
+                                    _ = convLayers[layer].Weights[iFilter, inputMap, x, y];
                                 }
                             }
                         }
 
                         // Filter bias weight.
-                        weightValue = convLayers[layer].BiasWeights[iFilter];
+                        _ = convLayers[layer].BiasWeights[iFilter];
 
                         File.AppendAllText(AppProperties.ServerLogPath, "Filter# [" + iFilter +
                             "] Conv bias = " + convLayers[layer].BiasWeights[iFilter].ToString("+0.0000000;-0.0000000") +
@@ -470,7 +464,7 @@ namespace AIDevServer
                     for (int input = 0; input < fcLayers[layer].Weights.GetLength(1); input++)
                     {
                         // FC weight.
-                        weightValue = fcLayers[layer].Weights[iOutput, input];
+                        _ = fcLayers[layer].Weights[iOutput, input];
                     }
                 }
             }
@@ -496,7 +490,7 @@ namespace AIDevServer
             //    ", change = " + change.ToString("+0.0000000;-0.0000000") +
             //     ", new weightValue = " + (weightValue + change).ToString("+0.0000000;-0.0000000") + "\r\n");
 
-            weightValue = weightValue + Convert.ToSingle(change);
+            weightValue += Convert.ToSingle(change);
 
             //if (weightValue > 2.0)
             //{
@@ -686,7 +680,7 @@ namespace AIDevServer
         private float[] RunFCLayer(int fcLayerNum, float[] fcInputs)
         {
             int numInputs = fcLayers[fcLayerNum].NumInputs;
-            int numOutputs = fcLayers[fcLayerNum].NumOutputs;
+            _ = fcLayers[fcLayerNum].NumOutputs;
             float outputValue;
 
             float[] fcOutputs = new float[fcLayers[fcLayerNum].NumOutputs];
@@ -697,13 +691,12 @@ namespace AIDevServer
                 weightedSum = 0;
                 for (int input = 0; input < numInputs; input++)
                 {
-                    weightedSum = weightedSum + (fcLayers[fcLayerNum].Weights[output, input] * fcInputs[input]);
+                    weightedSum += (fcLayers[fcLayerNum].Weights[output, input] * fcInputs[input]);
 
                     //File.AppendAllText(AppProperties.ServerLogPath, "Neuron value = " + fcInputs[input] + 
                     //    "Weight value = " + FCLayers[fcLayerNum].Weights[iOutput, input] + "\r\n");
                 }
-                weightedSum = weightedSum +
-                    (fcLayers[fcLayerNum].Weights[output, numInputs] * 1);  // Add bias.
+                weightedSum +=                     (fcLayers[fcLayerNum].Weights[output, numInputs] * 1);  // Add bias.
 
                 // Scale the weighted sum proportional to the number of inputs to avoid oversaturation.
                 weightedSum = (weightedSum / numInputs) * 80;
@@ -748,7 +741,7 @@ namespace AIDevServer
                             mapPointToReadY < 0 || mapPointToReadY >= inputMaps[inputMap].Height)
                         {
                             // Point is off the map, so use padding value.
-                            weightedSum = weightedSum + (convLayers[layer].Weights[filter, inputMap, filterX, filterY] * paddingValue);
+                            weightedSum += (convLayers[layer].Weights[filter, inputMap, filterX, filterY] * paddingValue);
                             if (isBackpropTraining)
                             {
                                 convBackpropLayers[layer].FilterInputs[filter, inputMap, filterX, filterY] += paddingValue;
@@ -756,7 +749,7 @@ namespace AIDevServer
                         }
                         else
                         {
-                            weightedSum = weightedSum + (convLayers[layer].Weights[filter, inputMap, filterX, filterY] *
+                            weightedSum += (convLayers[layer].Weights[filter, inputMap, filterX, filterY] *
                                 inputMaps[inputMap].Points[mapPointX, mapPointY]);
                             if (isBackpropTraining)
                             {
@@ -769,7 +762,7 @@ namespace AIDevServer
             }
 
             // Apply bias weight for the filter.
-            weightedSum = weightedSum + (convLayers[layer].BiasWeights[filter] * biasInput);
+            weightedSum += (convLayers[layer].BiasWeights[filter] * biasInput);
 
             weightedSum = (weightedSum / numFilterInputs) * 10;
             outputValue = ApplyActivationFunction(weightedSum);
@@ -787,9 +780,9 @@ namespace AIDevServer
 
             for (int filter = 0; filter < convLayers[layerNum].NumFilters; filter++)
             {
-                for (int x = 0; x < width; x = x + poolingStepSize)
+                for (int x = 0; x < width; x += poolingStepSize)
                 {
-                    for (int y = 0; y < height; y = y + poolingStepSize)
+                    for (int y = 0; y < height; y += poolingStepSize)
                     {
                         pooledX = 0;
                         pooledY = 0;
@@ -979,7 +972,7 @@ namespace AIDevServer
             int mapPointToReadX;
             int mapPointToReadY;
             //const float paddingValue = 0.0F;
-            int numFilterInputs = (filterSize * filterSize) + 1;
+            _ = (filterSize * filterSize) + 1;
 
             filterCenterPoint = (filterSize - 1) / 2;  // filterSize must be an odd number for this to work.
 
@@ -1096,8 +1089,8 @@ namespace AIDevServer
             {
                 if (layer > 0)
                 {
-                    width = width / poolingStepSize;
-                    height = height / poolingStepSize;
+                    width /= poolingStepSize;
+                    height /= poolingStepSize;
                 }
 
                 //featureMapsLayers[layerNum] = new FeatureMapsLayer(numFilters, width, height, poolingStepSize);
@@ -1160,10 +1153,7 @@ namespace AIDevServer
         //private int GetNumHidden(int numInputs, int numOutputs)
         void GetNumHidden(int numInputs, int numOutputs, int[] numLayerOutputs)
         {
-            int numLayerInputs = 0;
-            int numHiddenOutputs = 0;
 
-            numLayerInputs = numInputs;  // First layer's number of inputs is the net's number of inputs.
 
             // Look up integer division to see exactly what these values are without explicit conversion.
             float numHiddenOutputsStepSizeFloat = (numInputs - numOutputs) / NumFCLayers;
@@ -1185,7 +1175,7 @@ namespace AIDevServer
                     //numHiddenOutputs = numInputs - numHiddenOutputsStepSize * layer;
 
                     float numHiddenOutputsFloat = numInputs - (numHiddenOutputsStepSize * (layer + 1));
-                    numHiddenOutputs = Convert.ToInt32(Math.Round(numHiddenOutputsFloat, MidpointRounding.AwayFromZero));
+                    int numHiddenOutputs = Convert.ToInt32(Math.Round(numHiddenOutputsFloat, MidpointRounding.AwayFromZero));
 
                     // Test different numbers of hidden neurons.
                     //numHiddenOutputs = 60;
@@ -1199,7 +1189,6 @@ namespace AIDevServer
                         numHiddenOutputs + "\r\n");
 
                     // Next layer gets this layer's number of outputs as its number of inputs:
-                    numLayerInputs = numHiddenOutputs;
                 }
             }
         }
@@ -1335,27 +1324,25 @@ namespace AIDevServer
                 "FROM net WHERE id = " + netID
                 , KBConnection);
 
-                using (SqlDataReader reader = sql.ExecuteReader())
+                using SqlDataReader reader = sql.ExecuteReader();
+                reader.Read();
+                Name = Convert.ToString(reader[0]);
+
+                if (Convert.ToString(reader[1]) == "Convolutional")
                 {
-                    reader.Read();
-                    Name = Convert.ToString(reader[0]);
-
-                    if (Convert.ToString(reader[1]) == "Convolutional")
-                    {
-                        Type = NetType.Convolutional;
-                    }
-                    else
-                    {
-                        Type = NetType.FullyConnected;
-                    }
-
-                    Enum.TryParse(Convert.ToString(reader[2]), out ActivationFunction activationFunctionName);
-                    ActivationFunction = activationFunctionName;
-                    //ActivationFunction = Convert.ToString(reader[2]);
-                    NumConvLayers = Convert.ToInt32(reader[3]);
-                    NumInputs = Convert.ToInt32(reader[4]);
-                    NumOutputs = Convert.ToInt32(reader[5]);
+                    Type = NetType.Convolutional;
                 }
+                else
+                {
+                    Type = NetType.FullyConnected;
+                }
+
+                Enum.TryParse(Convert.ToString(reader[2]), out ActivationFunction activationFunctionName);
+                ActivationFunction = activationFunctionName;
+                //ActivationFunction = Convert.ToString(reader[2]);
+                NumConvLayers = Convert.ToInt32(reader[3]);
+                NumInputs = Convert.ToInt32(reader[4]);
+                NumOutputs = Convert.ToInt32(reader[5]);
             }
             catch (SqlException error)
             {

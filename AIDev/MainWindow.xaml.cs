@@ -11,10 +11,13 @@ namespace AIDev
     /// </summary>
     public partial class MainWindow : Window
     {
+        private bool debugServerMode = true;
         Process serverProcess;
 
         public MainWindow()
         {
+            WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
+
             InitializeComponent();
 
             menuItemTestTcpConnect.IsEnabled = true;
@@ -49,10 +52,14 @@ namespace AIDev
             buttonTabNetClose.Visibility = Visibility.Hidden;
             buttonTabTrainClose.Visibility = Visibility.Hidden;
 
-            //StartServer();
-            //Thread.Sleep(1000);  // Wait for server to start listening for new connection requests. Useful?
+            if (!debugServerMode)
+            {
+                StartServer();
+                //Thread.Sleep(1000);  // Wait for server to start listening for new connection requests. Useful?
+            }
+
             //TcpConnection.SendMessage("serverconnect");  // Reset server connection.
-            TcpConnect();
+           TcpConnect();
 
             menuItemTestStartServer.IsEnabled = false;
             menuItemTestTcpConnect.IsEnabled = false;
@@ -72,13 +79,20 @@ namespace AIDev
                 string response = "";
 
                 // Close server by sending command.
-                response = TcpConnection.SendMessage("closeserver");
+                //response = TcpConnection.SendMessage("closeserver");
 
-                //TcpConnection.Disconnect();
-
-                // Close server by closing process.
-                serverProcess.CloseMainWindow();
-                serverProcess.Close();  // Free resources associated with the server.
+                if (debugServerMode)
+                {
+                    // Close server by sending command.
+                    response = TcpConnection.SendMessage("closeserver");
+                    //TcpConnection.Disconnect();
+                }
+                else
+                {
+                    // Close server by closing process.
+                    serverProcess.CloseMainWindow();
+                    serverProcess.Close();  // Free resources associated with the server.
+                }
             }
             catch
             {
@@ -96,22 +110,32 @@ namespace AIDev
             //else
             {
                 // Start server and connect.
-                serverProcess = Process.Start(AppProperties.ServerPath);  // Start the AI Dev Server.
-                TcpConnect();
+                debugServerMode = false;
+                try
+                {
+                    //serverProcess = Process.Start("C:\\Users\\User2\\Dev\\AI Dev\\AIDev Solution\\AIDevServer\\bin" + 
+                    //    "\\Debug\\AIDevServer.exe");  // Start the AI Dev Server.
+                    serverProcess = Process.Start(AppProperties.ServerPath);  // Start the AI Dev Server.
+                    TcpConnect();
+                }
+                catch (Exception e)
+                {
+                    string result = "Exception: " + e;
+                    MessageBox.Show("Start Server result: \r\n" + result);
+                }
+
                 menuItemTestStartServer.IsEnabled = false;
                 menuItemTestCloseServer.IsEnabled = true;
                 menuItemTestTcpConnect.IsEnabled = false;
                 menuItemTestTcpDisconnect.IsEnabled = true;
                 menuItemTestTcpMessage.IsEnabled = true;
-
             }
         }
 
         private string TcpConnect()
         {
-            string response = "";
-            response = TcpConnection.Connect();
-            
+            string response = TcpConnection.Connect();
+
             menuItemTestTcpConnect.IsEnabled = false;
             menuItemTestTcpDisconnect.IsEnabled = true;
             menuItemTestTcpMessage.IsEnabled = true;
@@ -136,8 +160,7 @@ namespace AIDev
 
         private void MenuItemFileOpenKB_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            response = TcpConnection.SendMessage("openkb");
+            _ = TcpConnection.SendMessage("openkb");
             //MessageBox.Show("Server response: " + response);
         }
 
@@ -166,11 +189,10 @@ namespace AIDev
 
         private void MenuItemTestClearStream_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
 
             // Try to clear client stream.
             //response = TcpConnection.SendMessage("clearstream");
-            response = TcpConnection.ClearClientStream();
+            string response = TcpConnection.ClearClientStream();
 
             MessageBox.Show("Server response: " + response);
         }
@@ -182,8 +204,7 @@ namespace AIDev
 
         private void MenuItemTestCloseServer_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            response = TcpConnection.SendMessage("closeserver");
+            _ = TcpConnection.SendMessage("closeserver");
 
             menuItemTestStartServer.IsEnabled = true;
             menuItemTestCloseServer.IsEnabled = false;
@@ -196,15 +217,13 @@ namespace AIDev
 
         private void MenuItemTestTcpConnect_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            response = TcpConnect();
+            string response = TcpConnect();
             MessageBox.Show("TCP Connection result: \r\n" + response);
         }
 
         private void MenuItemTestTcpDisconnect_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            response = TcpConnection.Disconnect();
+            string response = TcpConnection.Disconnect();
             menuItemTestTcpConnect.IsEnabled = true;
             menuItemTestTcpDisconnect.IsEnabled = false;
             menuItemTestTcpMessage.IsEnabled = false;
@@ -213,29 +232,25 @@ namespace AIDev
 
         private void MenuItemTestTcpMessage_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            response = TcpConnection.SendMessage("test message");
+            string response = TcpConnection.SendMessage("test message");
             MessageBox.Show("Server response: " + response);
         }
 
         private void MenuItemWriteToLog_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            response = TcpConnection.SendMessage("writetolog");
+            _ = TcpConnection.SendMessage("writetolog");
         }
 
         private void MenuClearLog_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            response = TcpConnection.SendMessage("clearlog");
+            _ = TcpConnection.SendMessage("clearlog");
         }
 
         private void MenuItemTestCode_Click(object sender, RoutedEventArgs e)
         {
             //ViewNet("UCAlpha");
 
-            string response = "";
-            response = TcpConnection.SendMessage("runcode");
+            _ = TcpConnection.SendMessage("runcode");
             //response = TcpConnection.SendMessage("geterrorhistory");
             //UpdateTrainingPlot(response);
 
@@ -246,8 +261,7 @@ namespace AIDev
 
         private void MenuItemTestSQLStatement_Click(object sender, RoutedEventArgs e)
         {
-            string response = "";
-            response = TcpConnection.SendMessage("runsql");
+            _ = TcpConnection.SendMessage("runsql");
             //MessageBox.Show("Server response: " + response);
         }
 
@@ -471,13 +485,15 @@ namespace AIDev
         public static string IOFolderPath = AIDevDataFolderPath + @"\IO";
         public static string MotorOutPath = IOFolderPath + @"\motor out.txt";  // for motor outputs
 
-        public static string SolutionPath = System.AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\";
-        public static string ServerPath = SolutionPath + @"AIDevServer\bin\Debug\AIDevServer.exe";
+        public static string SolutionPath = Properties.Settings.Default.AIDevFolderPath + @"\AIDev Solution";
+        //public static string SolutionPath = System.AppDomain.CurrentDomain.BaseDirectory + @"..\..\..\";
+        public static string ServerPath = SolutionPath + @"\AIDevServer\bin\x64\Debug Multiple\netcoreapp3.1" +
+            @"\AIDevServer.exe";
         //public static string ServerPath = Properties.Settings.Default.AIDevFolderPath +
         //    @"\AIDev Solution\AIDevServer\bin\Debug Multiple\AIDevServer.exe";
 
         // Installed locations:
-        //public static string AIDevInstalledFolderPath = @"C:\Users\Admin\Data\Dev\AI Dev Installed";
+        //public static string AIDevInstalledFolderPath = @"C:\Users\User2\Dev\AI Dev Installed";
         //public static string ServerPath = AIDevInstalledFolderPath + @"\AIDevServer.exe";
     }
 }
