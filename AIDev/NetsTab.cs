@@ -10,7 +10,6 @@ using System.Windows.Media.Imaging;
 using OxyPlot;
 using System.Windows.Media;
 using System.Windows.Threading;
-using System.Threading;
 
 namespace AIDev
 {

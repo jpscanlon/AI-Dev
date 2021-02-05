@@ -17,7 +17,7 @@ class LangBnf
 
         LangRules = new List<LangRule>();
 
-        // ***** LOAD LANGUAGE DEFINITION RULES *******************************************************************
+        // ***** LOAD LANGUAGE DEFINITION RULES ****************************************************
 
         // TOP-LEVEL RULES
 
@@ -253,7 +253,8 @@ class LangBnf
 
         // Imperative-and/or phrase
         // (contains only predicates and "and/or" conjunctions)
-        // Needs to be re-worked - the relationship between logical "if" and control-flow "ifcase" and "and"/"or".
+        // Needs to be re-worked - the relationship between logical "if" and control-flow "ifcase"
+        // and "and"/"or".
         rule++;
         LangRules.Add(new LangRule());
         LangRules[rule].Token = "imperative_and_or_phra";
@@ -473,7 +474,7 @@ class LangBnf
         LangRules[rule].Clauses[clause].Items.Add("decl_phra");
         //LangRules[rule].Clauses[clause].Items.Add(")");
         LangRules[rule].Clauses[clause].Items.Add("temporal_conj"); // tense must match
-                                                                    //LangRules[rule].Clauses[clause].Items.Add("(");
+                                                   //LangRules[rule].Clauses[clause].Items.Add("(");
         LangRules[rule].Clauses[clause].Items.Add("decl_phra");
         //LangRules[rule].Clauses[clause].Items.Add(")");
         LangRules[rule].Clauses.Add(new LangClause()); clause++;
@@ -481,7 +482,7 @@ class LangBnf
         LangRules[rule].Clauses[clause].Items.Add("decl_phra");
         //LangRules[rule].Clauses[clause].Items.Add(")");
         LangRules[rule].Clauses[clause].Items.Add("because");  // tense needn't match
-                                                                //LangRules[rule].Clauses[clause].Items.Add("(");
+                                                   //LangRules[rule].Clauses[clause].Items.Add("(");
         LangRules[rule].Clauses[clause].Items.Add("decl_phra");
         //LangRules[rule].Clauses[clause].Items.Add(")");
 
@@ -919,7 +920,7 @@ class LangBnf
 
         LexRules = new List<LexRule>();
 
-        // ***** LOAD LEXICAL RULES *******************************************************************************
+        // ***** LOAD LEXICAL RULES ****************************************************************
 
         // TOP-LEVEL KEYWORDS
 
@@ -987,7 +988,8 @@ class LangBnf
         LexRules.Add(new LexRule());
         LexRules[rule].Token = "deleteword";
         LexRules[rule].Clauses.Add(new LexClause()); clause = 0;
-        LexRules[rule].Clauses[clause].Items.Add(new LexItem("deleteword", "delete word", "delete word"));
+        LexRules[rule].Clauses[clause].Items.Add(new LexItem("deleteword", "delete word", 
+            "delete word"));
 
         rule++;
         LexRules.Add(new LexRule());
@@ -1115,7 +1117,8 @@ class LangBnf
         LexRules[rule].Clauses[clause].Items.Add(new LexItem("most"));
         // Other
         //LexRules[rule].Clauses.Add(new LexClause()); clause++;
-        //LexRules[rule].Clauses[clause].ItemsObjs.Add(new LexItem("one_million", "one million", "one million"));
+        //LexRules[rule].Clauses[clause].ItemsObjs.Add(new LexItem("one_million", "one million", 
+        //  "one million"));
         //LexRules[rule].Clauses.Add(new LexClause()); clause++;
         //LexRules[rule].Clauses[clause].ItemsObjs.Add(new LexItem("a gazillion"));
 
@@ -1337,7 +1340,8 @@ class LangBnf
         LexRules[rule].Clauses.Add(new LexClause()); clause++;
         LexRules[rule].Clauses[clause].Items.Add(new LexItem("leftof", "left of", "left of"));
         LexRules[rule].Clauses.Add(new LexClause()); clause++;
-        LexRules[rule].Clauses[clause].Items.Add(new LexItem("infrontof", "in front of", "in front of")); // 2-D or 3-D
+        LexRules[rule].Clauses[clause].Items.Add(new LexItem("infrontof", "in front of", 
+            "in front of")); // 2-D or 3-D
         LexRules[rule].Clauses.Add(new LexClause()); clause++;
         LexRules[rule].Clauses[clause].Items.Add(new LexItem("behind")); // 2-D or 3-D
         LexRules[rule].Clauses.Add(new LexClause()); clause++;
@@ -1819,7 +1823,8 @@ class LangBnf
     }
 
     // Loads item types from item strings into corresponding ItemTypes arrays. For example: takes
-    // "[list] adj_unit" and sets the item type to enum ItemType.List, then removes "[list] " from the string.
+    // "[list] adj_unit" and sets the item type to enum ItemType.List, then removes "[list] " from
+    // the string.
     // Ordinary items get set to enum ItemType.Simple.
     private static void LoadEbnf()
     {

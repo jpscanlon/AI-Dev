@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AIDevServer
 {
     class Server
     {
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
             File.WriteAllText(AppProperties.ServerLogPath, "");  // Erase server log file.
 
@@ -40,9 +41,12 @@ namespace AIDevServer
                 if (cycleCount == 0) Console.Write(DateTime.Now.ToLongTimeString() + 
                     "\r\nServer running...\n");
                 if (cycleCount == 0 || cycleCount == 10) Console.Write("Getting commands...\r\n");
-                Thread.Sleep(100);
+                Thread.Sleep(50);
                 string commands = ServerTCPConnection.HandleConnection();
-                continueRunning = ProcessCommands(commands);
+                if (!string.IsNullOrEmpty(commands))
+                {
+                    continueRunning = ProcessCommands(commands);
+                }
                 cycleCount++;
                 if (cycleCount == 20) cycleCount = 0;
             }
@@ -51,7 +55,7 @@ namespace AIDevServer
             File.AppendAllText(AppProperties.ServerLogPath, "Closing server." + 
                 Environment.NewLine);
             Thread.Sleep(300);
-            return 0;
+            //return 0;
         }
 
         private static bool ProcessCommands(string commands)
@@ -60,7 +64,7 @@ namespace AIDevServer
             if (commands != null)
             {
                 Console.WriteLine("Commands received [" + commands + "]");
-                string response;
+                string response = "";
                 //commands = commands.ToLower();
 
                 if (commands == "clearstream")
@@ -111,6 +115,29 @@ namespace AIDevServer
                     netsData = Knowledgebase.GetNetsData();
                     ServerTCPConnection.ReturnResponse(netsData);
                 }
+                else if (commands == "python")
+                {
+                    //commands = @"print('Hello world!')";
+                    response = Knowledgebase.StartPython();
+                    ServerTCPConnection.ReturnResponse(response);
+                }
+                else if (commands.StartsWith("[py]"))
+                {
+                    if (commands[4..] == "exit()")
+                    {
+                        response = Knowledgebase.EndPython();
+                    }
+                    else
+                    {
+                        response = Knowledgebase.RunPython(commands[4..]);
+                    }
+                    ServerTCPConnection.ReturnResponse(response);
+                }
+                else if (commands.StartsWith("getpythonoutput"))
+                {
+                    response = Knowledgebase.GetPythonOutput();
+                    ServerTCPConnection.ReturnResponse(response);
+                }
                 else if (commands.StartsWith("addnet"))
                 {
                     response = Knowledgebase.CreateNet();
@@ -119,23 +146,23 @@ namespace AIDevServer
                 else if (commands.StartsWith("deletenet"))
                 {
                     response = Knowledgebase.DeleteNet(
-                        commands.Substring(10, commands.Length - 10));
+                        commands[10..]);
                     ServerTCPConnection.ReturnResponse(response);
                 }
                 else if (commands.StartsWith("opennet"))
                 {
-                    response = Knowledgebase.OpenNet(commands.Substring(8, commands.Length - 8));
+                    response = Knowledgebase.OpenNet(commands[8..]);
                     ServerTCPConnection.ReturnResponse(response);
                 }
                 else if (commands.StartsWith("updatenet"))
                 {
-                    response = Knowledgebase.SaveNet(commands.Substring(10, commands.Length - 10));
+                    response = Knowledgebase.SaveNet(commands[10..]);
                     ServerTCPConnection.ReturnResponse(response);
                 }
                 else if (commands.StartsWith("updatewholenet"))
                 {
                     response = Knowledgebase.ModifyAndSaveNet(
-                        commands.Substring(15, commands.Length - 15));
+                        commands[15..]);
                     ServerTCPConnection.ReturnResponse(response);
                 }
                 else if (commands.StartsWith("reinitialize"))
@@ -145,7 +172,7 @@ namespace AIDevServer
                 }
                 else if (commands.StartsWith("runnet"))
                 {
-                    response = Knowledgebase.RunNet(commands.Substring(7, commands.Length - 7));
+                    response = Knowledgebase.RunNet(commands[7..]);
                     ServerTCPConnection.ReturnResponse(response);
                 }
                 else if (commands.StartsWith("trainnet"))
@@ -154,7 +181,7 @@ namespace AIDevServer
                     //response = Knowledgebase.TrainNet(
                     //    commands.Substring(9, commands.Length - 9));
                     _ = Knowledgebase.TrainNetBackprop(
-                        commands.Substring(9, commands.Length - 9));
+                        commands[9..]);
                     //ServerTCPConnection.ReturnResponse(response);
                 }
                 else if (commands.StartsWith("stoptraining"))
@@ -170,7 +197,7 @@ namespace AIDevServer
                 else if (commands.StartsWith("processstatements"))
                 {
                     commands = commands.ToLower();
-                    Knowledgebase.ProcessStatements(commands.Substring(18, commands.Length - 18));
+                    Knowledgebase.ProcessStatements(commands[18..]);
                 }
                 else if (commands.StartsWith("getudwords"))
                 {

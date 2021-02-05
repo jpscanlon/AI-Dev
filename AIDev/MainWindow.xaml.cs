@@ -55,7 +55,8 @@ namespace AIDev
             if (!debugServerMode)
             {
                 StartServer();
-                //Thread.Sleep(1000);  // Wait for server to start listening for new connection requests. Useful?
+                //Thread.Sleep(1000);  // Wait for server to start listening for new connection
+                // requests. Useful?
             }
 
             //TcpConnection.SendMessage("serverconnect");  // Reset server connection.
@@ -64,6 +65,11 @@ namespace AIDev
             menuItemTestStartServer.IsEnabled = false;
             menuItemTestTcpConnect.IsEnabled = false;
             menuItemTestTcpDisconnect.IsEnabled = true;
+
+            //InitializeComponent();
+            // Handle executed events for commands textbox.
+            textBoxCommands.AddHandler(CommandManager.ExecutedEvent,
+                new RoutedEventHandler(TextBoxCommands_CommandExecuted), true);
 
             //ViewNets();
             ViewCommands();
@@ -249,7 +255,6 @@ namespace AIDev
         private void MenuItemTestCode_Click(object sender, RoutedEventArgs e)
         {
             //ViewNet("UCAlpha");
-
             _ = TcpConnection.SendMessage("runcode");
             //response = TcpConnection.SendMessage("geterrorhistory");
             //UpdateTrainingPlot(response);
@@ -265,7 +270,7 @@ namespace AIDev
             //MessageBox.Show("Server response: " + response);
         }
 
-        private void menuItemSettingsVoices_Click(object sender, RoutedEventArgs e)
+        private void MenuItemSettingsVoices_Click(object sender, RoutedEventArgs e)
         {
             MenuItem menuItem = (MenuItem)sender;
 
@@ -473,6 +478,21 @@ namespace AIDev
                     textBoxNetConvLayers.IsEnabled = true;
                 }
             }
+        }
+
+        private void MemuItemSettingsVoicesGet_Click(object sender, RoutedEventArgs e)
+        {
+            GetInstalledVoices();
+        }
+
+        private void ButtonGetOutput_Click(object sender, RoutedEventArgs e)
+        {
+            GetOutput();
+        }
+
+        private void ButtonStopOutput_Click(object sender, RoutedEventArgs e)
+        {
+            StopOutput();
         }
     }
 

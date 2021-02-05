@@ -1,22 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Speech.Recognition;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace AIDev
 {
     partial class MainWindow
     {
         const string commandsHeader = "AI Dev Jillian Interface\r\n\r\n";
-        // LINUX TERMINAL DOESN'T USE A SPACE. WINDOWS POWERSHELL DOES, COMMAND PROMPT DOESN'T.
-        private readonly string commandPrompt = ">";
-        public int PromptIndex;
+        // LINUX terminal doesn't use a space after prompt. Windows Powershell does, 
+        // Command Prompt doesn't, Python console does.
+        private string commandPrompt = ">";
+        private const string pythonCommandPrompt = ">>>";
+        public int promptIndex;
         private int lastCaretIndex;
         private string commandsText;
-        private static readonly bool StartWithRecAndSynthOn = false;
+        private static readonly bool startWithRecAndSynthOn = false;
+
+        DispatcherTimer timerPythonOutput;
+        DateTime lastPythonOutputTime;
+        //int getPythonOutputInterval = 0.5;
 
         private void ViewCommands()
         {
@@ -31,6 +37,8 @@ namespace AIDev
             textBoxCommands.HorizontalScrollBarVisibility = 0;
             textBoxCommands.Text = "";
 
+            //textBoxCommands.AcceptsReturn = true;
+
             //commandsText = GetExampleText();
             commandsText = commandsHeader + commandPrompt;
 
@@ -39,11 +47,12 @@ namespace AIDev
             commandsText = textBoxCommands.Text;
 
             textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
-            PromptIndex = textBoxCommands.CaretIndex;
+            promptIndex = textBoxCommands.CaretIndex;
             lastCaretIndex = textBoxCommands.CaretIndex;
 
             // Image Control
-            BitmapImage imageSource = new BitmapImage(new Uri(@"C:\Users\User2\Dev\AI Dev\AIDev Resources\Images\readingcouch660x357.jpg",
+            BitmapImage imageSource = new BitmapImage(new Uri(
+                @"C:\Users\User2\Dev\AI Dev\AIDev Resources\Images\readingcouch660x357.jpg",
                 UriKind.RelativeOrAbsolute));
             imageInputImage1.Source = imageSource;
             //C:\Users\User2\Dev\AI Dev\AIDev Resources\Images\readingcouch660x357.jpg
@@ -57,7 +66,7 @@ namespace AIDev
             LoadUDWords();
 
             string loadSynthResult = "";
-            if (StartWithRecAndSynthOn)
+            if (startWithRecAndSynthOn)
             {
                 loadSynthResult = Speech.LoadSpeechSynthesizer();
                 if (loadSynthResult == "")
@@ -90,14 +99,66 @@ namespace AIDev
             }
 
             textBoxCommands.IsEnabled = true;
+
+            tabItemCommands.Focus();
         }
 
         public void ProcessStatements(string statements)
         {
+            statements = statements.Trim();
             if (statements.StartsWith("speak"))
             {
                 statements = statements.Substring(6, statements.Length - 6);
                 Speech.Speak(Speech.AddPronunciation(statements));
+
+                textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+                textBoxCommands.AppendText("\r\n\r\n" + commandPrompt);
+                commandsText = textBoxCommands.Text;
+                promptIndex = textBoxCommands.Text.Length;
+                textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+                lastCaretIndex = textBoxCommands.Text.Length;
+            }
+            else if (statements.StartsWith("getvoices"))
+            {
+                string installedVoices = Speech.GetInstalledVoices();
+
+                textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+                textBoxCommands.AppendText("\r\n\r\n" + installedVoices + "\r\n" + commandPrompt);
+                commandsText = textBoxCommands.Text;
+                promptIndex = textBoxCommands.Text.Length;
+                textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+                lastCaretIndex = textBoxCommands.Text.Length;
+            }
+            else if (statements.ToLower() == "python")
+            {
+                string response = TcpConnection.SendMessage("python");
+
+                commandPrompt = pythonCommandPrompt;
+                textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+                textBoxCommands.AppendText("\r\n" + response.TrimEnd() + "\r\n\r\n" + 
+                    commandPrompt);
+                commandsText = textBoxCommands.Text;
+                promptIndex = textBoxCommands.Text.Length;
+                textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+                lastCaretIndex = textBoxCommands.Text.Length;
+            }
+            else if (commandPrompt == pythonCommandPrompt)
+            {
+                string response = TcpConnection.SendMessage("[py]" + statements);
+
+                if (response == "[python closed]")
+                {
+                    commandPrompt = ">";  // Switch back to normal command prompt.
+                    StopOutput();
+                }
+                else
+                {
+                    lastPythonOutputTime = DateTime.UtcNow;
+                    timerPythonOutput = new DispatcherTimer();
+                    timerPythonOutput.Tick += new EventHandler(TimerPythonOutput_Tick);
+                    timerPythonOutput.Interval = new TimeSpan(0, 0, 0, 0, 200);
+                    timerPythonOutput.Start();
+                }
             }
             else
             {
@@ -122,20 +183,79 @@ namespace AIDev
                     response = "okay;";
                 }
 
-                lastCaretIndex = textBoxCommands.CaretIndex;
                 textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
                 textBoxCommands.AppendText("\r\n" + response.TrimEnd() + "\r\n\r\n" + commandPrompt);
                 commandsText = textBoxCommands.Text;
-                PromptIndex = textBoxCommands.Text.Length;
+                promptIndex = textBoxCommands.Text.Length;
                 textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
                 lastCaretIndex = textBoxCommands.Text.Length;
 
-                if (Speech.Synth != null && checkBoxVoiceSynth.IsChecked == true && 
+                if (Speech.Synth != null && checkBoxVoiceSynth.IsChecked == true &&
                     response.Length < 200)
                 {
                     Speech.Speak(response);
                 }
             }
+        }
+
+        private void TimerPythonOutput_Tick(object sender, EventArgs e)
+        {
+            string response = TcpConnection.SendMessage("getpythonoutput");
+
+            if (response == "[python closed]")
+            {
+                StopOutput();
+            }
+            else if (response == "[no output]")
+            {
+                // If max time passed since last output, stop checking for outputs.
+                TimeSpan timeSinceLastPythonOutput = DateTime.UtcNow - lastPythonOutputTime;
+                if (timeSinceLastPythonOutput.TotalMilliseconds > 1000)
+                {
+                    StopOutput();
+                }
+            }
+            else
+            {
+                // Display output in Commands textbox.
+                lastPythonOutputTime = DateTime.UtcNow;
+                textBoxCommands.AppendText("\r\n" + response.TrimEnd() + "\r\n");
+                textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+                commandsText = textBoxCommands.Text;
+            }
+        }
+
+        private void GetOutput()
+        {
+            if (commandPrompt == pythonCommandPrompt)
+            {
+                string response = TcpConnection.SendMessage("getpythonoutput");
+
+                //textBoxCommands.Text = textBoxCommands.Text.Substring(0, promptIndex);
+                //textBoxCommands.CaretIndex = promptIndex;
+
+                if (response != "[no output]")
+                {
+                    textBoxCommands.AppendText("\r\n" + response.TrimEnd() + "\r\n");
+                    textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+                    commandsText = textBoxCommands.Text;
+                }
+            }
+        }
+
+        private void StopOutput()
+        {
+            if (timerPythonOutput != null)
+            {
+                timerPythonOutput.Stop();
+                timerPythonOutput = null;
+            }
+
+            textBoxCommands.AppendText("\r\n" + commandPrompt);
+            commandsText = textBoxCommands.Text;
+            promptIndex = textBoxCommands.Text.Length;
+            textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+            lastCaretIndex = textBoxCommands.Text.Length;
         }
 
         private void LoadUDWords()
@@ -191,6 +311,19 @@ namespace AIDev
             }
         }
 
+        private void GetInstalledVoices()
+        {
+            if (tabItemCommands.IsEnabled == false)
+            {
+                ViewCommands();
+            }
+
+            textBoxCommands.Text = textBoxCommands.Text.Remove(promptIndex - 1);
+            textBoxCommands.AppendText(">getvoices");
+            textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+            ProcessStatements(textBoxCommands.Text.Substring(promptIndex));
+        }
+
         private void SelectVoice(string voice)
         {
             Speech.SelectVoice(voice);
@@ -206,17 +339,35 @@ namespace AIDev
             }
         }
 
-        private void TestRecognize(string word)
+        //private void TestRecognize(string word)
+        //{
+        //    checkBoxVoiceRecogition.IsChecked = false;
+        //    Speech.RecEngine.EmulateRecognizeAsync(word);
+        //}
+
+        private void TextBoxCommands_CommandExecuted(object sender, RoutedEventArgs e)
         {
-            checkBoxVoiceRecogition.IsChecked = false;
-            Speech.RecEngine.EmulateRecognizeAsync(word);
+            // If this is a paste event, paste all lines from the clipboard (not just the first).
+            if ((e as ExecutedRoutedEventArgs).Command == ApplicationCommands.Paste)
+            {
+                string clipboardText = Clipboard.GetText().TrimEnd();
+
+                textBoxCommands.Text = commandsText.Substring(0, promptIndex) + clipboardText;
+                textBoxCommands.CaretIndex = textBoxCommands.Text.Length;
+                commandsText = textBoxCommands.Text;
+                lastCaretIndex = textBoxCommands.Text.Length;
+
+                //if (e.Handled) { }
+            }
         }
 
         private void TextBoxCommands_KeyDown(object sender, KeyEventArgs e)
         {
+            //if (e.Key == Key.Enter)
             if (e.Key == Key.Return)
             {
-                ProcessStatements(textBoxCommands.Text.Substring(PromptIndex));
+                //textBoxCommands.AcceptsReturn = false;
+                ProcessStatements(textBoxCommands.Text.Substring(promptIndex));
             }
         }
 
@@ -248,12 +399,12 @@ namespace AIDev
             if (textBoxCommands.CaretIndex == 0)
             {
                 // Handle changes while textBox is being initialized.
-                if (lastCaretIndex < PromptIndex)
+                if (lastCaretIndex < promptIndex)
                 {
                     if (textBoxCommands.Text != commandsText)
                     {
                         textBoxCommands.Text = commandsText;
-                        textBoxCommands.CaretIndex = PromptIndex;
+                        textBoxCommands.CaretIndex = promptIndex;
                     }
                 }
             }
@@ -261,12 +412,12 @@ namespace AIDev
             {
                 int changeLength = textBoxCommands.Text.Length - commandsText.Length;
 
-                if ((textBoxCommands.CaretIndex - changeLength) < PromptIndex ||
-                    textBoxCommands.CaretIndex < PromptIndex)
+                if ((textBoxCommands.CaretIndex - changeLength) < promptIndex ||
+                    textBoxCommands.CaretIndex < promptIndex)
                 {
                     // Change is to text before the prompt index - don't allow.
                     textBoxCommands.Text = commandsText;
-                    textBoxCommands.CaretIndex = PromptIndex;
+                    textBoxCommands.CaretIndex = promptIndex;
                 }
                 else
                 {

@@ -46,6 +46,56 @@ namespace AIDev
             //}
         }
 
+        public static string GetInstalledVoices()
+        {
+            string installedVoices = "";
+            string loadSynthResult = "";
+            
+            if (Synth == null)
+            {
+                loadSynthResult = Speech.LoadSpeechSynthesizer();
+            }
+
+            if (loadSynthResult == "")
+            {
+                foreach (InstalledVoice voice in Synth.GetInstalledVoices())
+                {
+                    VoiceInfo info = voice.VoiceInfo;
+                    //string AudioFormats = "";
+                    //foreach (SpeechAudioFormatInfo fmt in info.SupportedAudioFormats)
+                    //{
+                    //    AudioFormats += String.Format("{0}\n",
+                    //    fmt.EncodingFormat.ToString());
+                    //}
+                    installedVoices += " Name:          " + info.Name + "\r\n" +
+                    " Culture:       " + info.Culture + "\r\n" +
+                    " Age:           " + info.Age + "\r\n" +
+                    " Gender:        " + info.Gender + "\r\n" +
+                    " Description:   " + info.Description + "\r\n" +
+                    " ID:            " + info.Id + "\r\n" +
+                    " Enabled:       " + voice.Enabled + "\r\n";
+                    //if (info.SupportedAudioFormats.Count != 0)
+                    //{
+                    //    Console.WriteLine(" Audio formats: " + AudioFormats);
+                    //}
+                    //else
+                    //{
+                    //    Console.WriteLine(" No supported audio formats found");
+                    //}
+
+                    //string AdditionalInfo = "";
+                    //foreach (string key in info.AdditionalInfo.Keys)
+                    //{
+                    //    AdditionalInfo += String.Format("  {0}: {1}\n", key, info.AdditionalInfo[key]);
+                    //}
+
+                    //Console.WriteLine(" Additional Info - " + AdditionalInfo);
+                    //Console.WriteLine();
+                }
+            }
+            return installedVoices;
+        }
+
         public static string LoadSpeechRecognizer()
         {
             string error = "";
@@ -169,7 +219,7 @@ namespace AIDev
                     {
                         ((MainWindow)Application.Current.MainWindow).textBoxCommands.AppendText(";");
                     }
-                    ((MainWindow)Application.Current.MainWindow).ProcessStatements(((MainWindow)Application.Current.MainWindow).textBoxCommands.Text.Substring(((MainWindow)Application.Current.MainWindow).PromptIndex));
+                    ((MainWindow)Application.Current.MainWindow).ProcessStatements(((MainWindow)Application.Current.MainWindow).textBoxCommands.Text.Substring(((MainWindow)Application.Current.MainWindow).promptIndex));
                     break;
                 case "correction":
                     DeleteLastWord();
@@ -177,7 +227,7 @@ namespace AIDev
                 case "number":
                     // If not the first word.
                     if (((MainWindow)Application.Current.MainWindow).textBoxCommands.Text.Length >
-                        ((MainWindow)Application.Current.MainWindow).PromptIndex)
+                        ((MainWindow)Application.Current.MainWindow).promptIndex)
                     {
                         // Add a space before the number.
                         ((MainWindow)Application.Current.MainWindow).textBoxCommands.AppendText(" ");
@@ -233,7 +283,7 @@ namespace AIDev
                 default:
                     if (((MainWindow)Application.Current.MainWindow).
                     textBoxCommands.Text.Length > ((MainWindow)Application.Current.MainWindow)
-                        .PromptIndex)  // If not at the beginning of commands.
+                        .promptIndex)  // If not at the beginning of commands.
                     {
                         if (((MainWindow)Application.Current.MainWindow).textBoxCommands.Text
                             [((MainWindow)Application.Current.MainWindow).
@@ -564,12 +614,12 @@ namespace AIDev
 
         private static void DeleteLastWord()
         {
-            if (((MainWindow)Application.Current.MainWindow).textBoxCommands.Text.Length > ((MainWindow)Application.Current.MainWindow).PromptIndex)
+            if (((MainWindow)Application.Current.MainWindow).textBoxCommands.Text.Length > ((MainWindow)Application.Current.MainWindow).promptIndex)
             {
                 int position = ((MainWindow)Application.Current.MainWindow).
                     textBoxCommands.Text.Length - 1;
                 while (((MainWindow)Application.Current.MainWindow).textBoxCommands.Text[position] != 
-                    ' ' && position > ((MainWindow)Application.Current.MainWindow).PromptIndex)
+                    ' ' && position > ((MainWindow)Application.Current.MainWindow).promptIndex)
                 {
                     position--;
                 }
@@ -629,9 +679,9 @@ namespace AIDev
                     Properties.Settings.Default.ttsVoice = "Microsoft Zira Desktop";
                     break;
                 case "Hazel":
-                    //Properties.Settings.Default.ttsVoice = "Microsoft Hazel Desktop";
-                    Properties.Settings.Default.ttsVoice = 
-                        "Microsoft Server Speech Text to Speech Voice (en-GB, Hazel)";
+                    Properties.Settings.Default.ttsVoice = "Microsoft Hazel Desktop";
+                    //Properties.Settings.Default.ttsVoice = 
+                    //    "Microsoft Server Speech Text to Speech Voice (en-GB, Hazel)";
                     break;
                 case "Helen":
                     Properties.Settings.Default.ttsVoice =
@@ -649,18 +699,22 @@ namespace AIDev
 
         public static void Speak(string speechText = "")
         {
-            if (RecEngine != null)
+            if (Synth != null)
             {
-                if (((MainWindow)Application.Current.MainWindow).checkBoxVoiceRecogition.IsChecked == true)
-                {
-                    // Turn off voice recognition while speaking. Turn back on in SpeakCompleted event.
-                    RecEngine.RecognizeAsyncCancel();
-                }
-            }
 
-            speechText = AddPronunciation(speechText);
-            Speaking = true;
-            Synth.SpeakAsync(speechText);
+                if (RecEngine != null)
+                {
+                    if (((MainWindow)Application.Current.MainWindow).checkBoxVoiceRecogition.IsChecked == true)
+                    {
+                        // Turn off voice recognition while speaking. Turn back on in SpeakCompleted event.
+                        RecEngine.RecognizeAsyncCancel();
+                    }
+                }
+
+                speechText = AddPronunciation(speechText);
+                Speaking = true;
+                Synth.SpeakAsync(speechText);
+            }
         }
 
         public static string AddPronunciation(string jillianText)

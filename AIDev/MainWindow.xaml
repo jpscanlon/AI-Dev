@@ -129,23 +129,27 @@
             </MenuItem>
             <MenuItem x:Name="menuItemSettings" Header="Settings">
                 <MenuItem x:Name="menuItemSettingsVoices" Header="Voices" InputGestureText="">
-                    <!--<MenuItem.Icon>
-                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\Knowledgebase.png"/>
-                    </MenuItem.Icon>-->
+                    <MenuItem.Icon>
+                        <Image Source="C:\Users\User2\Dev\AI Dev\AIDev Resources\Icons\UserVoice_color_16x.png"/>
+                    </MenuItem.Icon>
                     <MenuItem x:Name="menuItemSettingsVoicesDavid" Header="Microsoft David Desktop - US" Tag="David"
-                            Click="menuItemSettingsVoices_Click">
+                            Click="MenuItemSettingsVoices_Click">
                     </MenuItem>
                     <MenuItem x:Name="menuItemSettingsVoicesZira" Header="Microsoft Zira Desktop - US" Tag="Zira"
-                            Click="menuItemSettingsVoices_Click">
+                            Click="MenuItemSettingsVoices_Click">
                     </MenuItem>
-                    <MenuItem x:Name="menuItemSettingsVoicesHazel" Header="Microsoft Server Hazel - GB" Tag="Hazel"
-                            Click="menuItemSettingsVoices_Click">
+                    <MenuItem x:Name="menuItemSettingsVoicesHazel" Header="Microsoft Hazel Desktop - GB" Tag="Hazel"
+                            Click="MenuItemSettingsVoices_Click">
                     </MenuItem>
-                    <MenuItem x:Name="menuItemSettingsVoicesHelen" Header="Microsoft Server Helen - US" Tag="Helen" 
-                            Click="menuItemSettingsVoices_Click">
+                    <!--<MenuItem x:Name="menuItemSettingsVoicesHelen" Header="Microsoft Server Helen - US" Tag="Helen" 
+                            Click="MenuItemSettingsVoices_Click">
                     </MenuItem>
                     <MenuItem x:Name="menuItemSettingsVoicesHaley" Header="Microsoft Server Haley - AU" Tag="Hayley"
-                            Click="menuItemSettingsVoices_Click">
+                            Click="MenuItemSettingsVoices_Click">
+                    </MenuItem>-->
+                    <Separator/>
+                    <MenuItem x:Name="menuItemSettingsVoicesGet" Header="Get Installed Voices" 
+                              Click="MemuItemSettingsVoicesGet_Click">
                     </MenuItem>
                 </MenuItem>
             </MenuItem>
@@ -277,6 +281,8 @@
                     <CheckBox x:Name="checkBoxVoiceSynth" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.614,13.933" Margin="40,436,0,0" Width="20" Grid.Column="1" Checked="CheckBoxVoiceSynth_Checked" Unchecked="CheckBoxVoiceSynth_Unchecked"/>
                     <Label x:Name="labelListen" Content="Voice Recognition" HorizontalAlignment="Left" Margin="60,451,0,0" VerticalAlignment="Top" Height="20" Width="107" Padding="5,0" VerticalContentAlignment="Bottom" Grid.Column="1"/>
                     <CheckBox x:Name="checkBoxVoiceRecogition" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" RenderTransformOrigin="1.614,13.933" Margin="40,456,0,0" Width="20" Grid.Column="1" Checked="CheckBoxVoiceRecognition_Checked" Unchecked="CheckBoxVoiceRecognition_Unchecked"/>
+                    <Button x:Name="buttonStopOutput" Content="Stop Output" HorizontalAlignment="Left" Margin="276,480,0,0" VerticalAlignment="Top" Width="75" Click="ButtonStopOutput_Click"/>
+                    <Button x:Name="buttonGetOutput" Content="Get Output" HorizontalAlignment="Left" Margin="181,480,0,0" VerticalAlignment="Top" Width="75" Click="ButtonGetOutput_Click"/>
                 </Grid>
             </TabItem>
             <TabItem x:Name="tabItemVocab" Margin="0" BorderBrush="{x:Null}" Background="#FFF0F0F0" GotFocus="TabItemVocab_GotFocus" LostFocus="TabItemVocab_LostFocus">
